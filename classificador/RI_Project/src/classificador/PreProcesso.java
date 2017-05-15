@@ -16,7 +16,7 @@ public class PreProcesso {
         ArrayList<String> listG = getPageText("src\\classificador\\urlsBase\\gLinksToVisit.txt");
         ArrayList<String> listB = getPageText("src\\classificador\\urlsBase\\bLinksToVisit.txt");
         		
-        for (int i = 0; i < listG.size(); i++) {
+       for (int i = 0; i < listG.size(); i++) {
         	try {
             	url = new URL(listG.get(i));
                 getPage(url, "src\\classificador\\Examples\\Positives\\PosDoc"+i);

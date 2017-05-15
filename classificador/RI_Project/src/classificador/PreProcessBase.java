@@ -3,6 +3,7 @@ package classificador;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Random;
 
 import weka.core.Instances;
 import weka.core.converters.TextDirectoryLoader;
@@ -16,9 +17,9 @@ public class PreProcessBase {
 		TextDirectoryLoader textD = createArff();
 		System.out.println(textD);
 	    Instances dataFiltered = getVector(textD);
-	    
+	  
 	    //create flat file
-	    PrintWriter writer = new PrintWriter("src\\classificador\\Arffs\\Test0.arff", "UTF-8");
+	    PrintWriter writer = new PrintWriter("src\\classificador\\Arffs\\PosNegat.arff", "UTF-8");
 	    writer.println(dataFiltered);
 	    writer.close();
 	    
