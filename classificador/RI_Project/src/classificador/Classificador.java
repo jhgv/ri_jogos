@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class Classificador{
 		// Finalizando a classificação
 		//local do modelo de classificacao criado
 
-		String localModelo = "src\\classificador\\Modelos\\Logistic.model" ;
+		String localModelo = "src\\classificador\\Modelos\\J48Tt.model" ;
 
 		//features do classificador
 		String[] attributes = at;
@@ -152,13 +153,17 @@ public class Classificador{
 		PrintWriter w = new PrintWriter("Pages\\Positives\\PosPages.txt");
 		for (File file2 : files) {
 			if(file2.isFile()){
-				String dados = new String(Files.readAllBytes(file2.toPath()));
+				
+				//String dados = new String(Files.readAllBytes(file2.toPath()));
+				
+				String dados = PreProcesso.getStringPage(file2);;
 				if(classificador.classify(dados)){
 					w.write("Página " + count + " é uma página recomendada.\n");
 				}
 			}
 			count++;
 		}
+		System.out.println("Classificação atualizada.");
 		w.close();
 	}
 

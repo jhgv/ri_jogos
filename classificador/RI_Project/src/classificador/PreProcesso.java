@@ -2,9 +2,11 @@ package classificador;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.apache.commons.compress.utils.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 
@@ -16,7 +18,7 @@ public class PreProcesso {
         ArrayList<String> listG = getPageText("src\\classificador\\urlsBase\\gLinksToVisit.txt");
         ArrayList<String> listB = getPageText("src\\classificador\\urlsBase\\bLinksToVisit.txt");
         		
-       for (int i = 0; i < listG.size(); i++) {
+      for (int i = 0; i < listG.size(); i++) {
         	try {
             	url = new URL(listG.get(i));
                 getPage(url, "src\\classificador\\Examples\\Positives\\PosDoc"+i);
@@ -24,7 +26,7 @@ public class PreProcesso {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-		}   
+		}
         System.out.println("\n\nPáginas Positivas Criadas!!\n\n");
         for (int i = 0; i < listB.size(); i++) {
         	try {
@@ -53,7 +55,7 @@ public class PreProcesso {
 	// Recebe a url que deseja capturar, retorna a página Html, faz o parser pra string e armazena em um novo arquivo
 	public static void getPage(URL url,String path) throws IOException {
         
-		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8"));
+		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(),Charsets.UTF_8));
         
         String content = "";
         try {
@@ -79,5 +81,26 @@ public class PreProcesso {
         writer.flush();
         writer.close();
     }
+	
+	public static String getStringPage(File file) throws IOException{
+		BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file),Charsets.UTF_8));
+		
+		String content = "";
+        try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = in.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = in.readLine();
+	        }
+	        content = sb.toString();
+	    } finally {
+	        in.close();
+	    }
+        
+        return Jsoup.parse(content).body().text();
+	}
 
 }
