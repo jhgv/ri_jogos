@@ -1,7 +1,10 @@
 package classificador;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URLEncoder;
@@ -59,26 +62,7 @@ public class Classificador{
         return values = new double[2];
 	}	
 	
-	public static Classificador getClassif(){
-		Classificador classificador = null;
-		
-		try {
-			classificador = getClassificador();
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("Classificador não encontrado.");
-		}
-		return classificador;
-	}
-
-	public static Classificador getClassificador(){
-		Classificador classify = null;
 	
-		return null;
-		
-		
-		
-	}
     public static void main(String[] args){
         //local do modelo de classificacao criado
         String localModelo = args[0];
