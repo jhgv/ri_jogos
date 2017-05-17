@@ -19,7 +19,7 @@ public class PreProcessBase {
 	    Instances dataFiltered = getVector(textD);
 	  
 	    //criando arquivo .arff com conteudo
-	    PrintWriter writer = new PrintWriter("src\\classificador\\Arffs\\PosNegat.arff", "UTF-8");
+	    PrintWriter writer = new PrintWriter("src\\classificador\\Arffs\\PosNeg.arff", "UTF-8");
 	    writer.println(dataFiltered);
 	    writer.close();
 	    

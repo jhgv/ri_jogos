@@ -108,7 +108,7 @@ public class Classificador{
 		// Gerando array de string para os atributos do .arff 
 
 		Classificador classify = null;
-		BufferedReader in = new BufferedReader(new FileReader("src\\classificador\\Arffs\\PosNegat.arff"));
+		BufferedReader in = new BufferedReader(new FileReader("src\\classificador\\Arffs\\PosNegFS_att.arff"));
 		ArffReader arff = new ArffReader(in);
 		String at[] = new String[arff.getData().numAttributes()-1];
 		for (int i = 0; i < at.length; i++) at[i]=arff.getData().attribute(i).name();
@@ -116,7 +116,7 @@ public class Classificador{
 		// Finalizando a classificação
 		//local do modelo de classificacao criado
 
-		String localModelo = "src\\classificador\\Modelos\\J48Tt.model" ;
+		String localModelo = "src\\classificador\\Modelos\\J48.model" ;
 
 		//features do classificador
 		String[] attributes = at;
@@ -158,7 +158,7 @@ public class Classificador{
 				
 				String dados = PreProcesso.getStringPage(file2);;
 				if(classificador.classify(dados)){
-					w.write("Página " + count + " é uma página recomendada.\n");
+					w.write("Página " + file2.getName() + " é uma página recomendada.\n");
 				}
 			}
 			count++;
