@@ -74,13 +74,45 @@ public class PreProcesso {
         
         String document = Jsoup.parse(content).body().text();
         
-        PrintWriter writer = new PrintWriter(path, "UTF-8");
-		writer.println(document);
-   
+        PrintWriter writer = new PrintWriter(path);
+		
+		String line = in.readLine();
+
+        while (line != null) {
+        	writer.println(line + "\n");
+            line = in.readLine();
+        }
         in.close();
         writer.flush();
         writer.close();
     }
+	
+	public static void getHtml(URL url) throws IOException{
+		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(),Charsets.UTF_8));
+
+        PrintWriter writer = new PrintWriter("C:\\Users\\marilda\\Desktop\\Page.html", "UTF-8");
+		
+        String content = "";
+        try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = in.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = in.readLine();
+	        }
+	        content = sb.toString();
+	    } finally {
+	        in.close();
+	    }
+        
+        
+        
+        writer.println(content);
+        writer.flush();
+        writer.close();
+	}
 	
 	public static String getStringPage(File file) throws IOException{
 		BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file),Charsets.UTF_8));
