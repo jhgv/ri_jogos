@@ -21,8 +21,9 @@ public class Wrapper {
 	public static String ARTIFACT_PATH = "..\\RI_Project\\documentos";
 	
 	public static void main(String[] args){
-		String[] doms = new String[1];
+		String[] doms = new String[2];
 		doms[0] = "americanas";
+		doms[1] = "gamestop";
 		Wrapper w = new Wrapper();
 		w.Start(doms,"bfs");
 		
@@ -101,7 +102,7 @@ public class Wrapper {
 			info = getInfoCultura(doc); 
 		} else if (actDomain.contains("www.submarino.com.br")) {
 			info = getInfoSubmarino(doc);
-		} else if (actDomain.contains("www.MUDARISSOAQUI.com.br")) {
+		} else if (actDomain.contains("www.gamestop.com")) {
 			info = getInfoGameStop(doc);
 		} else if (actDomain.contains("store.steampowered.com")) {
 			info = getInfoSteam(doc);
@@ -144,9 +145,14 @@ public class Wrapper {
 			if(fullTitle.contains("Game")){
 				fullTitle = fullTitle.replace("Game", "");
 			}
-			String[] aux = elem.text().split("-");
-			System.out.println(aux[0]);
-			titulo = elem.text().substring(5);
+			String[] aux = fullTitle.split("-");
+			if(aux[0].equals(" ")){
+				
+				titulo = aux[1];
+			}else{
+				titulo = aux[0];
+			}
+			
 			
 		} else{
 			titulo = "Sem título";
@@ -181,7 +187,7 @@ public class Wrapper {
 
 					if ((desc.get(i)[0].equals("gênero")) || (desc.get(i)[0].equals("classificação indicativa"))
 							|| (desc.get(i)[0].equals("desenvolvedor")) || (desc.get(i)[0].equals("áudio"))
-							|| (desc.get(i)[0].equals("idiomas"))) {
+							|| (desc.get(i)[0].equals("idiomas") || (desc.get(i)[0].equals("plataforma")))) {
 
 						sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " \r\n");
 					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etária")) {
@@ -455,9 +461,19 @@ public class Wrapper {
 		String titulo = "";
 		String preco = "";
 		String dados ="";
+		Elements elem = (doc.getElementsByAttributeValue("class", "grid_17 ats-prod-title"));
 		
 		//Recupera Titulo
-		
+		if (elem != null && !elem.toString().equals("")){
+			if(elem.text().contains("by")){
+				String[] aux = elem.text().split(" by ");
+				titulo = aux[0];
+			}else{
+				titulo = elem.text();
+			}
+		}else{
+			titulo = "Sem Título";
+		}
 		//Recupera Preco
 		
 		//Recupera Dados
