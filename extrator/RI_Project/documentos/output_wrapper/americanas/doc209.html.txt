@@ -1,0 +1,10 @@
+Titulo:  Street Fighter V 
+Preco: R$ 49,99
+plataforma: ps4 
+gênero: luta 
+idiomas: português 
+Faixa Etária: 12 anos
+
+
+
+

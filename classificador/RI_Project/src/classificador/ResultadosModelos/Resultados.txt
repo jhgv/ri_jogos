@@ -1,0 +1,164 @@
+-----------------------------  Metrícas Modelos -----------------------------------------
+
+++++++++++++++++++++++++++++++++++++   bayes.NaiveBayes  +++++++++++++++++++++++++++++++++++++
+
+Time taken to build model: 0.1 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.1 seconds
+
+=== Summary ===
+
+Correctly Classified Instances          67               82.716  %
+Incorrectly Classified Instances        14               17.284  %
+Kappa statistic                          0.6545
+Mean absolute error                      0.176 
+Root mean squared error                  0.4148
+Relative absolute error                 35.2867 %
+Root relative squared error             82.9951 %
+Total Number of Instances               81     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,810    0,154    0,850      0,810    0,829      0,655    0,857     0,834     Negatives
+                 0,846    0,190    0,805      0,846    0,825      0,655    0,858     0,799     Positives
+Weighted Avg.    0,827    0,171    0,828      0,827    0,827      0,655    0,858     0,817     
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 34  8 |  a = Negatives
+  6 33 |  b = Positives
+
+++++++++++++++++++++++++++++++++++++   trees.J48   +++++++++++++++++++++++++++++++++++++
+
+Time taken to build model: 0.47 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.02 seconds
+
+=== Summary ===
+
+Correctly Classified Instances          79               97.5309 %
+Incorrectly Classified Instances         2                2.4691 %
+Kappa statistic                          0.9505
+Mean absolute error                      0.0396
+Root mean squared error                  0.1509
+Relative absolute error                  7.9312 %
+Root relative squared error             30.1944 %
+Total Number of Instances               81     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1,000    0,051    0,955      1,000    0,977      0,952    0,986     0,976     Negatives
+                 0,949    0,000    1,000      0,949    0,974      0,952    0,986     0,985     Positives
+Weighted Avg.    0,975    0,027    0,976      0,975    0,975      0,952    0,986     0,980     
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 42  0 |  a = Negatives
+  2 37 |  b = Positives
+  
+++++++++++++++++++++++++++++++++++++   Function.Logistic  +++++++++++++++++++++++++++++++++++++
+
+
+Time taken to build model: 1.89 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.02 seconds
+
+=== Summary ===
+
+Correctly Classified Instances          81              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0.0001 %
+Total Number of Instances               81     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     Negatives
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     Positives
+Weighted Avg.    1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 42  0 |  a = Negatives
+  0 39 |  b = Positives
+
+++++++++++++++++++++++++++++++++++++   Function.SMO  +++++++++++++++++++++++++++++++++++++
+
+Time taken to build model: 0.25 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.03 seconds
+
+=== Summary ===
+
+Correctly Classified Instances          81              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances               81     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     Negatives
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     Positives
+Weighted Avg.    1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 42  0 |  a = Negatives
+  0 39 |  b = Positives
+
+ ++++++++++++++++++++++++++++++++++++   trees.RandomTree  +++++++++++++++++++++++++++++++++++++
+ 
+ Time taken to build model: 0.02 seconds
+
+=== Evaluation on test set ===
+
+Time taken to test model on supplied test set: 0.01 seconds
+
+=== Summary ===
+
+Correctly Classified Instances          81              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances               81     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     Negatives
+                 1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     Positives
+Weighted Avg.    1,000    0,000    1,000      1,000    1,000      1,000    1,000     1,000     
+
+=== Confusion Matrix ===
+
+  a  b   <-- classified as
+ 42  0 |  a = Negatives
+  0 39 |  b = Positives
+
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

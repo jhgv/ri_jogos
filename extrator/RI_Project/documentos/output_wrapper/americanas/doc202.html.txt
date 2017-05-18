@@ -1,0 +1,11 @@
+Titulo:  Halo Wars 2 
+Preco: R$ 99,99
+plataforma: xbox one 
+gênero: tiro em primeira pessoa (fps) 
+classificação indicativa: 14 
+desenvolvedor: microsoft 
+áudio: português 
+
+
+
+
