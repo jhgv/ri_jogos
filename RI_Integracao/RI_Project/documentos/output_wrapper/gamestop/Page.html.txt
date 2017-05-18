@@ -1,0 +1,10 @@
+Titulo: Injustice 2 Ultimate Edition
+Preco: $99.99
+platform: xbox one 
+publisher:  warner home video games 
+developer:  warner home video games 
+category: fighting 
+
+
+
+
