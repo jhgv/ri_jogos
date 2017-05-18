@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Files;
@@ -21,6 +22,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+
+import org.apache.commons.compress.utils.Charsets;
+import org.apache.commons.io.FileUtils;
 
 import weka.classifiers.Classifier;
 import weka.core.Instances;
@@ -32,6 +36,8 @@ public class Classificador{
 	private Classifier classifier;
 	private Instances instances;
 	private String[] attributes;
+	private static String domain[] = { "americanas", "fastgames", "magazineluiza",
+			"saraiva", "livrariacultura", "gamestop", "submarino", "walmart" , "store.playstation", "store.steampowered"};
 
 	public Classificador(Classifier classifier, Instances instances, String[] attributes){
 		this.classifier = classifier;
@@ -70,7 +76,7 @@ public class Classificador{
 	}
 
 	private double[] getValues(String pagina) {
-		
+
 		int countAtt = this.attributes.length - 1;
 		double[] values = new double[countAtt];
 
@@ -80,7 +86,7 @@ public class Classificador{
 		for (int i = 0; i < tokens.length; i++) {
 			listTokens.add(tokens[i]);
 		}
-		
+
 		// Descobrindo a quantidade de vezes do elemento
 		Map<String,Integer> map = new HashMap<>();
 		for (String s : listTokens) {
@@ -92,7 +98,7 @@ public class Classificador{
 			}
 			map.put(s, n);
 		}
-		
+
 		for (int i = 0; i < countAtt; i++) {
 			if (map.containsKey(this.attributes[i])) {
 				values[i] = map.get(this.attributes[i]);
@@ -141,30 +147,86 @@ public class Classificador{
 		return classificador;
 
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		Classificador classificador = getClassificador();
-		File file = new File("Pages");
-		ArrayList<File> files = new ArrayList<File>(Arrays.asList((file).listFiles()));
-		
-		new File("Pages\\Positives").mkdir();
-		
-		int count = 0;
-		PrintWriter w = new PrintWriter("Pages\\Positives\\PosPages.txt");
-		for (File file2 : files) {
-			if(file2.isFile()){
-				
-				//String dados = new String(Files.readAllBytes(file2.toPath()));
-				
-				String dados = PreProcesso.getStringPage(file2);;
-				if(classificador.classify(dados)){
-					w.write("Página " + file2.getName() + " é uma página recomendada.\n");
+
+		int countDomain = 0;
+
+		while(countDomain++ < domain.length){
+			
+			File file = new File("documentos\\heuristica\\" + domain[countDomain] );
+			ArrayList<File> files = new ArrayList<File>(Arrays.asList((file).listFiles()));
+			File fileLinks = new File("documentos\\heuristica\\" + domain[countDomain]+ "\\links_visitados.txt" );
+			ArrayList<Integer> links_Ids = new ArrayList<>();
+
+			new File(file.getPath()+ "\\positives\\").mkdir();
+
+			int count = 0;
+			
+			
+			for (File file2 : files) {
+				if(file2.isFile() && !(file2.getName().equals("links_visitados.txt"))){
+					//String dados = new String(Files.readAllBytes(file2.toPath()));
+					String page = PreProcesso.getStringPage(file2);
+					
+					if (classificador.classify(page)) {
+						File fileResult = new File(file.getPath() + "\\Positives\\" + file2.getName());
+						setFile(setTextToHtml(file2), fileResult);
+						links_Ids.add(count);
+					}
+					count++;
 				}
+				
 			}
-			count++;
+			
+			getPos_Links(file.getPath() + "\\Positives\\posLinks.txt", fileLinks, links_Ids);
 		}
-		System.out.println("Classificação atualizada.");
-		w.close();
+	}
+	
+	public static void getPos_Links(String pathNewFile, File linkFiles, ArrayList<Integer> lines) {
+		File urls = new File(pathNewFile);
+		try {
+			PrintWriter printWriter = new PrintWriter(urls);
+			for (Integer line : lines) {
+				String lineFile = (String) FileUtils.readLines(linkFiles).get(line);
+				printWriter.println(lineFile);
+			}
+			printWriter.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void setFile(String text, File file) {
+		try {
+			FileWriter fw = new FileWriter(file);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(text);
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static String setTextToHtml(File file) throws IOException{
+		int len;
+		char[] chr = new char[4096];
+		final StringBuffer buffer = new StringBuffer();
+		final FileReader reader = new FileReader(file);
+		try {
+			while ((len = reader.read(chr)) > 0) {
+				buffer.append(chr, 0, len);
+			}
+		} finally {
+			reader.close();
+		}
+		return buffer.toString();
 	}
 
 }

@@ -34,7 +34,7 @@ public class PreProcessBase {
 		return textD;
 	}
 	
-	// criando BagOfWords
+	// criando BagOfWords - Instances
 	public static Instances getVector(TextDirectoryLoader textD) throws Exception{
 		
 		Instances dataReturn;
@@ -46,5 +46,4 @@ public class PreProcessBase {
 		 
 		 return dataReturn;
 	}
-	
 }

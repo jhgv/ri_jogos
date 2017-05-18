@@ -28,7 +28,7 @@ public class PreProcesso {
             }
 		}
         System.out.println("\n\nPáginas Positivas Criadas!!\n\n");
-        /*for (int i = 0; i < listB.size(); i++) {
+        for (int i = 0; i < listB.size(); i++) {
         	try {
         		url = new URL(listB.get(i));
                 getPage(url, "src\\classificador\\Examples\\Negatives\\NegDoc"+i);
@@ -36,7 +36,7 @@ public class PreProcesso {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-		}*/
+		}
         System.out.println("Capturados e armazenados os exemplos positivos e negativos para a base...");
     }
 	// Função pra varrer os arquivos com as urls Bases e retornar um ArrayList com cada Url
@@ -101,8 +101,6 @@ public class PreProcesso {
 	    } finally {
 	        in.close();
 	    }
-        
-        
         
         writer.println(content);
         writer.flush();
