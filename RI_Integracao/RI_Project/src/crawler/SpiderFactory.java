@@ -6,9 +6,10 @@ import java.io.IOException;
 public class SpiderFactory {
 
 	private static final String domain[] = { "americanas", "fastgames", "magazineluiza",
-			"nagem", "saraiva", "steampowered", "submarino", "walmart" };
+			"saraiva", "livrariacultura", "gamestop", "submarino", "walmart" , "store.playstation", "steampowered"};
+	
 
-	public static String ARTIFACT_PATH = "documentos\\";
+	public static String DOCUMENTOS_PATH = "documentos/";
 
 	private Thread threads[];
 	public static boolean error = false;
@@ -18,7 +19,7 @@ public class SpiderFactory {
 	}
 
 	public void startCrawlers() throws IOException, InterruptedException {
-		File f = new File(ARTIFACT_PATH);
+		File f = new File(DOCUMENTOS_PATH);
 
 		if (!f.exists())
 			f.mkdirs();
@@ -35,7 +36,7 @@ public class SpiderFactory {
 
 	
 	private void startHeuristicCrawlers() throws RuntimeException {
-		ARTIFACT_PATH += "heuristica\\";
+		DOCUMENTOS_PATH += "heuristica/";
 		for (int i = 0; i < 10; i++)
 			(this.threads[i] = new Thread(new HeuristicSpider(SpiderFactory.domain[i]))).start();
 	}

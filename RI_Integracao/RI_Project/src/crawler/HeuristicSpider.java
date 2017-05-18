@@ -1,13 +1,3 @@
-/*
- * Universidade Federal de Pernambuco
- * Centro de Inform�tica (CIn)
- * Recupera��o de Informa��o
- * 
- * Ana Caroline Ferreira de Fran�a (acff)
- * Thiago Aquino Santos (tas4)
- * Victor Sin Yu Chen (vsyc)
- */
-
 package crawler;
 
 import java.util.List;
@@ -22,11 +12,9 @@ import org.jsoup.select.Elements;
 
 public class HeuristicSpider extends Spider {
 
-	// Constants
 	private Dictionary goodTerms;
 	private Dictionary badTerms;
 
-	// Constructor
 	public HeuristicSpider(String domain) {
 		super(domain);
 		createDictionaries();
@@ -52,6 +40,7 @@ public class HeuristicSpider extends Spider {
 	}
 
 	
+	@Override
 	void crawl(String url, int timeout) throws IOException, InterruptedException {
 		Connection.Response html = connect(url, timeout);
 		Thread.sleep(1000);
@@ -79,7 +68,6 @@ public class HeuristicSpider extends Spider {
 		}
 	}
 
-	
 	private void selectHeuristic(String url) {
 		if (this.domain == "steampowered") {
 			steamHeuristic(url);
@@ -106,7 +94,6 @@ public class HeuristicSpider extends Spider {
 			this.linksToVisit.add(url);
 	}
 
-	
 	private void standardHeuristic(String url, String[] words, boolean gD) {
 		boolean bT = badTerms.contains(words), gT = goodTerms.contains(words);
 
@@ -125,19 +112,31 @@ public class HeuristicSpider extends Spider {
 }
 
 class Dictionary {
-	// Variables
 	List<String> words;
 
-	// Constructor
 	public Dictionary() {
 		this.words = new LinkedList<String>();
 	}
 
+	/***
+	 * This method will add a String s to the dictionary.
+	 * 
+	 * @param s
+	 *            the String to be added to the dictionary
+	 */
 	public void addWord(String s) {
 		words.add(s);
 	}
 
-	
+	/***
+	 * This method will check if the dictionary contains any of the words
+	 * received.
+	 * 
+	 * @param toBeChecked
+	 *            list with the words to be checked
+	 * @return TRUE if the dictionary contains any words received; FALSE
+	 *         otherwise
+	 */
 	public boolean contains(String[] toBeChecked) {
 		for (String word : words) {
 			for (String check : toBeChecked) {
