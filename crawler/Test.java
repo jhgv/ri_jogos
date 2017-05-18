@@ -1,12 +1,3 @@
-/*
- * Universidade Federal de Pernambuco
- * Centro de Inform�tica (CIn)
- * Recupera��o de Informa��o
- * 
- * Ana Caroline Ferreira de Fran�a (acff)
- * Thiago Aquino Santos (tas4)
- * Victor Sin Yu Chen (vsyc)
- */
 
 package crawler;
 

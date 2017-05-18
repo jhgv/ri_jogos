@@ -1,13 +1,3 @@
-/*
- * Universidade Federal de Pernambuco
- * Centro de Inform�tica (CIn)
- * Recupera��o de Informa��o
- * 
- * Ana Caroline Ferreira de Fran�a (acff)
- * Thiago Aquino Santos (tas4)
- * Victor Sin Yu Chen (vsyc)
- */
-
 package crawler;
 
 import java.util.List;
@@ -20,19 +10,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-/***
- * Here we will implement the Crawler's Heuristic algorithm.
- * 
- * @author Victor Chen
- *
- */
 public class HeuristicSpider extends Spider {
 
-	// Constants
 	private Dictionary goodTerms;
 	private Dictionary badTerms;
 
-	// Constructor
 	public HeuristicSpider(String domain) {
 		super(domain);
 		createDictionaries();
@@ -57,18 +39,7 @@ public class HeuristicSpider extends Spider {
 
 	}
 
-	/***
-	 * This method will connect to the URL, get the page body and get the next
-	 * links to be visited, obeying some heuristic algorithm defined by the
-	 * Search Engine's developer group.
-	 * 
-	 * @param url
-	 *            the URL from which the page will be acquired
-	 * @param timeout
-	 *            the maximum time to wait for the response
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
+	
 	@Override
 	void crawl(String url, int timeout) throws IOException, InterruptedException {
 		Connection.Response html = connect(url, timeout);
@@ -97,15 +68,6 @@ public class HeuristicSpider extends Spider {
 		}
 	}
 
-	/***
-	 * This method will select the heuristic to be used. Both the heuristics
-	 * tends to not discard the supposed irrelevant pages, because these pages
-	 * may contain relevant links in the body. However, both of them will check
-	 * all the supposed relevant pages in the toVisit list first.
-	 * 
-	 * @param url
-	 *            the URL to be visited
-	 */
 	private void selectHeuristic(String url) {
 		if (this.domain == "steampowered") {
 			steamHeuristic(url);
@@ -121,16 +83,7 @@ public class HeuristicSpider extends Spider {
 		}
 	}
 
-	/***
-	 * This method is the heuristic for the domain "steampowered". The heuristic
-	 * for steam is different for others because the URL for steam products only
-	 * have the product code and, in most cases, it only needs a specific part
-	 * of the link to know if the page is relevant or not for the Crawler. If
-	 * the language isn't "pt-br" the Crawler will discard the page.
-	 * 
-	 * @param url
-	 *            the URL to be visited
-	 */
+	
 	private void steamHeuristic(String url) {
 		if (url.contains("?l="))
 			return;
@@ -141,20 +94,6 @@ public class HeuristicSpider extends Spider {
 			this.linksToVisit.add(url);
 	}
 
-	/***
-	 * This method is the standard heuristic for the Crawler. It will implement
-	 * the dictionary method. The URL will be checked to see if it contains any
-	 * of the bad terms saved in the dictionary. As some domains have the
-	 * 'product' tag or variations, the heuristic will use that tag to
-	 * differentiate categories pages from product pages.
-	 * 
-	 * @param url
-	 *            the URL to be visited
-	 * @param words
-	 *            a list with the terms of the suffix of the URL
-	 * @param gD
-	 *            boolean to check if this domain is a good domain
-	 */
 	private void standardHeuristic(String url, String[] words, boolean gD) {
 		boolean bT = badTerms.contains(words), gT = goodTerms.contains(words);
 
@@ -173,10 +112,8 @@ public class HeuristicSpider extends Spider {
 }
 
 class Dictionary {
-	// Variables
 	List<String> words;
 
-	// Constructor
 	public Dictionary() {
 		this.words = new LinkedList<String>();
 	}
