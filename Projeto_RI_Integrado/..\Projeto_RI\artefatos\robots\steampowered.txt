@@ -1,5 +1,0 @@
-Host: store.steampowered.com
-User-Agent: *
-Disallow: /share/
-Disallow: /news/externalpost/
-Disallow: /account/emailoptout/?*token=
