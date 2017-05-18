@@ -1,0 +1,11 @@
+Titulo: HORIZON ZERO DAWN (PS4)
+Preco: R$ 199,90
+desenvolvedor: sony games br
+plataforma:  ps4
+categoria: rpg
+idiomas: espanhol, inglês, português
+classificação indicativa:  14 anos
+
+
+
+
