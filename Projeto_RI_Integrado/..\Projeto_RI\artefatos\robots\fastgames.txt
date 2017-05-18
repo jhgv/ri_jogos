@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /loja/carrinho.php*
+Disallow: /loja/pag_parcelado.php*
+Disallow: /*transID*
+Disallow: /checkout*
+Sitemap: http://www.fastgames.com.br/loja/arquivos/187970/sitemaps/sitemap.xml
