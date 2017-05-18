@@ -17,20 +17,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
+
 public class Wrapper {
 	public static String ARTIFACT_PATH = "..\\RI_Project\\documentos";
-	
-	public static void main(String[] args){
-		String[] doms = new String[5];
-		doms[0] = "americanas";
-		doms[1] = "gamestop";
-		doms[2] = "steam";
-		doms[3] = "saraiva";
-		doms[4] = "cultura";
-		Wrapper w = new Wrapper();
-		w.Start(doms,"bfs");
-		
-	}
 	
 	public void Start(String [] dominios, String crawlerMethod){
 
@@ -116,7 +105,7 @@ public class Wrapper {
 		}
 
 		String titulo = info.getTitulo();
-		if(!(titulo.equalsIgnoreCase("Sem título") || titulo.equalsIgnoreCase(""))){
+		if(!(titulo.equalsIgnoreCase("Sem titulo") || titulo.equalsIgnoreCase(""))){
 			String preco = info.getPreco();
 			String outrosDados = info.getDados();
 			synchronized (pw) {
@@ -158,7 +147,7 @@ public class Wrapper {
 			
 			
 		} else{
-			titulo = "Sem título";
+			titulo = "Sem titulo";
 		}
 		
 		//Recupera o Preco
@@ -232,7 +221,7 @@ public class Wrapper {
 			titulo = aux2[0];
 			
 		}else{
-			titulo = "Sem título";
+			titulo = "Sem titulo";
 		}
 		
 		//Recupera Preco
@@ -279,7 +268,7 @@ public class Wrapper {
 		
 		//Recupera Titulo
 		if (titulo.equals("") || titulo.contains("Console")) {
-			titulo = "Sem Título";
+			titulo = "Sem Titulo";
 		}else{
 			String[] aux = titulo.split("-");
 			titulo = aux[0];
@@ -360,7 +349,7 @@ public class Wrapper {
 		
 		//Recupera Titulo
 		if (elem != null && elem.text().contains("onsole")) {
-			titulo = "Sem título";
+			titulo = "Sem titulo";
 		} 
 		
 		//Recupera Preco
@@ -396,7 +385,7 @@ public class Wrapper {
 						desc.get(i)[0] = desc.get(i)[0].substring(desc.get(i)[0].indexOf("<b>"),
 								desc.get(i)[0].indexOf(":"));
 						desc.get(i)[0] = desc.get(i)[0].substring(3, desc.get(i)[0].length());
-						System.out.println(desc.get(i)[0]+" "+desc.get(i)[1]);
+						
 						if ((desc.get(i)[0].equals("gênero")) || (desc.get(i)[0].contains("classificação indicativa"))
 								|| (desc.get(i)[0].equals("áudio")) || (desc.get(i)[0].equals("idiomas"))|| (desc.get(i)[0].equals("plataforma"))) {
 
@@ -404,12 +393,12 @@ public class Wrapper {
 						}else if((desc.get(i)[0].equals("desenvolvedor"))){
 							String[] aux = desc.get(i)[1].split(">");
 							desc.get(i)[1] = aux[1].split("<")[0];
-							System.out.println(desc.get(i)[1]);
+							
 							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + "\r\n");
 						}else if((desc.get(i)[0].equals("categoria"))){
 							String[] aux= desc.get(i)[1].split("</a>");
 							desc.get(i)[1] = aux[aux.length-1].split(">")[1];
-							System.out.println(desc.get(i)[1]);
+							
 							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + "\r\n");
 						}
 					}
@@ -433,14 +422,71 @@ public class Wrapper {
 		
 		String titulo = "";
 		String preco = "";
-		String dados ="";
+		String dados = "";
 		
-		//Recupera Titulo
-		
+		Elements elem = doc.getElementsByAttributeValue("itemprop", "name");
+		if (elem != null) {
+			if(elem.text().contains("-")){
+				titulo = elem.text().split("-")[0];
+				System.out.println("aqui");
+			} else {
+				titulo = elem.text();
+				
+			}
+		} else {
+			titulo = "Sem título";
+		}
 		//Recupera Preco
-		
+		elem = doc.getElementsByAttributeValue("class", "preco-avista precoAvista");
+		if (elem != null && !elem.toString().equals("")) {
+			if(elem.text().length() < 10) {
+				preco = elem.text();
+			} else {
+				preco = elem.text().split(" R")[0];
+			}
+		} else{
+			preco = "Sem preço";
+		}
+
 		//Recupera Dados
 		
+		elem = doc.getElementsByAttributeValue("cellpadding", "0");
+		//System.out.println(elem.toString());
+		StringBuffer sb = new StringBuffer("");
+		ArrayList<String[]> desc = new ArrayList<String[]>();
+		
+		if (elem != null && elem.text().contains("Gênero")) {
+			
+			String[] aux = elem.toString().split("</table>");
+			for (int i = 0; i < aux.length; i++) {
+				desc.add(aux[i].split("</strong>"));
+				
+				if(!desc.get(i)[0].endsWith("font>")){
+					String[] aux2 = desc.get(i)[0].split(">");
+					desc.get(i)[0] = aux2[aux2.length-1];
+				}else{
+					desc.get(i)[0] = desc.get(i)[0].replace("</font>", "");
+					String[] aux3 = desc.get(i)[0].split(">");
+					desc.get(i)[0] = aux3[aux3.length-1];
+				}
+				
+				if(!desc.get(i)[1].endsWith("font>")){
+					String[] aux2 = desc.get(i)[1].split(">");
+					desc.get(i)[1] = aux2[aux2.length-1];
+				}else{
+					desc.get(i)[1] = desc.get(i)[1].replace("</font>", "");
+					String[] aux3 = desc.get(i)[1].split(">");
+					desc.get(i)[1] = aux3[aux3.length-1];
+				}
+				
+				if(desc.get(i)[0].equalsIgnoreCase("gênero") || desc.get(i)[0].equalsIgnoreCase("quantidade de jogadores") 
+						|| desc.get(i)[0].equalsIgnoreCase("idade recomendada")|| desc.get(i)[0].equalsIgnoreCase("marca")){
+					sb.append(desc.get(i)[0]+": "+desc.get(i)[1]+"\r\n");
+				}
+			}
+		} else{
+			dados = "";
+		}	
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
@@ -450,19 +496,60 @@ public class Wrapper {
 	
 	public PageInfo getInfoMagazine(Document doc){
 		PageInfo pi = new PageInfo();
-		String titulo = "";
+		String titulo = doc.title();
 		String preco = "";
 		String dados ="";
 		
-		//Recupera Titulo
+		titulo = titulo.split(" - ")[0];
 		
+		if(titulo.contains("Console")){
+			titulo = "Sem Titulo";
+		}
 		//Recupera Preco
+		Elements elem = doc.getElementsByAttributeValue("class", "js-price-value");
 		
+		if (elem != null  ){
+			if(!elem.text().contains("XXX")){
+				preco = elem.text();
+			}else{
+				preco = "Sem preço";
+			}
+			
+		}else{
+			preco = "Sem preço";
+		}
 		//Recupera Dados
+		boolean isConsole = false;
+		elem = doc.getElementsByAttributeValue("class", "fs-row");
+		StringBuffer sb = new StringBuffer("");
+
+		if (elem != null) {
+			for (Element e : elem) {
+				if (e.text().contains("Informações")){
+					sb.append(e.text().substring(e.text().indexOf("Marca"), e.text().indexOf("Referência")) + "\r\n");
+				}
+				if (e.text().contains("Gênero") || e.text().contains("Idioma")
+						|| e.text().contains("Idade recomendada")){
+					sb.append(e.text() + "\r\n");
+				}
+				if(e.text().contains("Console") ){
+					isConsole = true;
+				}
+			}
+
+			dados = sb.toString();
+		} else{
+			dados = "Sem Dados";
+		}
 		
-		pi.setPreco(preco);
-		pi.setTitulo(titulo);
-		pi.setDados(dados);
+		if(!isConsole){
+			pi.setPreco(preco);
+			pi.setTitulo(titulo);
+			pi.setDados(dados);
+		}else{
+			pi.setTitulo("Sem titulo");
+		}
+		
 		
 		return pi;
 	}
@@ -483,7 +570,7 @@ public class Wrapper {
 				titulo = elem.text();
 			}
 		}else{
-			titulo = "Sem Título";
+			titulo = "Sem Titulo";
 		}
 		//Recupera Preco
 		elem = (doc.getElementsByAttributeValue("class", "ats-prodBuy-price"));
@@ -573,10 +660,58 @@ public class Wrapper {
 		String dados ="";
 		
 		//Recupera Titulo
+		Elements elem = doc.getElementsByAttributeValue("class", "mp-tit-name prodTitle");
+		if (elem != null && elem.text().contains("Game")) {
+			titulo = elem.text().substring(elem.text().indexOf("Game"), elem.text().length());
+		} else {
+			titulo = "Sem título";
+		}
 		
 		//Recupera Preco
-		
+		elem = doc.getElementsByAttributeValue("itemprop", "price/salesPrice");
+		if (elem != null) {
+			preco = elem.text();
+		} else {
+			preco = "Sem preço";
+		}
 		//Recupera Dados
+		elem = doc.getElementsByAttributeValue("class", "ficha-tecnica");
+		ArrayList<String[]> desc = new ArrayList<String[]>();
+		StringBuffer sb = new StringBuffer("");
+
+		if (elem != null) {
+			for (Element e : elem) {
+				String texto[] = e.toString().toLowerCase().split("</tr>");
+
+				// Formatação da saída dos dados
+				for (int i = 0; i < texto.length - 1; i++) {
+					desc.add(texto[i].split("</th>"));
+					desc.get(i)[0] = desc.get(i)[0].replace("<tbody>", "");
+					desc.get(i)[0] = desc.get(i)[0].replace("<tr>", "");
+					desc.get(i)[0] = desc.get(i)[0].replace("<th>", "");
+					desc.get(i)[0] = desc.get(i)[0].replaceAll("\n", "");
+					desc.get(i)[0] = desc.get(i)[0].replaceAll(" ", "");
+					desc.get(i)[1] = desc.get(i)[1].replaceAll(" ", "");
+					desc.get(i)[1] = desc.get(i)[1].replaceAll("\n", "");
+					desc.get(i)[1] = desc.get(i)[1].replace("<td>", "");
+					desc.get(i)[1] = desc.get(i)[1].replace("</td>", "");
+
+					if ((desc.get(i)[0].equalsIgnoreCase("Gênero")) || (desc.get(i)[0].equalsIgnoreCase("Classificação indicativa"))
+							|| (desc.get(i)[0].equalsIgnoreCase("Desenvolvedor")) || (desc.get(i)[0].equalsIgnoreCase("Áudio"))
+							|| (desc.get(i)[0].equalsIgnoreCase("idiomas"))) {
+
+						sb.append(desc.get(i)[0] + ": " + desc.get(i)[1] + "\r\n");
+					} else if (desc.get(i)[0].equalsIgnoreCase("FaixaEtária")) {
+						sb.append("Faixa Etária: " + desc.get(i)[1] + "\r\n");
+					}
+				}
+			}
+
+			dados = sb.toString();
+		} else {
+			dados = "";
+		}
+		
 		
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
@@ -591,14 +726,53 @@ public class Wrapper {
 		String dados ="";
 		
 		//Recupera Titulo
+		Elements elem = doc.getElementsByAttributeValue("class", "product-title");
 		
+		titulo= elem.text();
 		//Recupera Preco
+		Elements o = doc.getElementsByAttributeValue("class", "int");
+		Elements p = doc.getElementsByAttributeValue("class", "dec");
+
+		if (o != null) {
+			if(o.text().contains(" ")){
+				String inte = o.text().substring(0, o.text().indexOf(' '));
+				String dec = p.text().substring(0, p.text().indexOf(' '));
+				preco= (inte + dec);
+			} else {
+				preco = (o.text() + p.text());
+			}
+		} else {
+			preco = "Sem preço";
+		}
 		
 		//Recupera Dados
-		
+		StringBuffer sb = new StringBuffer("");
+		Elements genero = doc.getElementsByAttributeValue("class", "value-field Genero");
+		Elements marca = doc.getElementsByAttributeValue("itemprop", "brand");
+		Elements faixa = doc.getElementsByAttributeValue("class", "value-field Faixa-Etaria");
+		Elements idioma = doc.getElementsByAttributeValue("class", "value-field Idiomas-Audio");
+
+		if (genero != null && ! genero.toString().equals("")) {
+			sb.append("Gênero: " + genero.text().substring(0, genero.text().length()) + "\r\n");
+		}
+
+		if (marca != null && !marca.toString().equals("")) {
+			sb.append("Marca: " + marca.text().substring(0, marca.text().length()) + "\r\n");
+		}
+
+		if (faixa != null && !faixa.toString().equals("")) {
+			sb.append("Faixa: " + faixa.text().substring(0, faixa.text().length()) + "\r\n");
+		}
+
+		if (idioma != null && !idioma.toString().equals("")) {
+			sb.append("Idioma: " + idioma.text().substring(0, idioma.text().length()) + "\r\n");
+		}
+
+		dados = sb.toString();
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
+		
 		return pi;
 	}
 	

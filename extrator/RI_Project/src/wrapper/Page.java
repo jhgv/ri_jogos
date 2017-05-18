@@ -12,14 +12,14 @@ public class Page {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		URL url = new URL("http://www.livrariacultura.com.br/p/games/consoles/mega-drive-46536114");
+		URL url = new URL("http://www.fastgames.com.br/destiny-2-pre-venda-ps4-pr-12903-187970.htm");
 		getHtml(url);
 	}
 	
 	public static void getHtml(URL url) throws IOException{
 		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(),Charsets.UTF_8));
 
-        PrintWriter writer = new PrintWriter("..\\RI_Project\\documentos\\bfs\\cultura\\positives\\doc1.html", "UTF-8");
+        PrintWriter writer = new PrintWriter("..\\RI_Project\\documentos\\bfs\\fast\\positives\\doc0.html", "UTF-8");
 		
         String content = "";
         try {
