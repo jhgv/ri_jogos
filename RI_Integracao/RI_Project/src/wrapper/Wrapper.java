@@ -21,12 +21,6 @@ import org.jsoup.select.Elements;
 public class Wrapper {
 	public static String ARTIFACT_PATH = "..\\RI_Project\\documentos";
 
-	public static void main(String[] args) {
-		String[] dom = {"walmart"};
-		String bfs = "bfs";
-		Wrapper w = new Wrapper();
-		w.Start(dom, bfs);
-	}
 
 	public void Start(String [] dominios, String crawlerMethod){
 
