@@ -20,11 +20,17 @@ import org.jsoup.select.Elements;
 
 public class Wrapper {
 	public static String ARTIFACT_PATH = "..\\RI_Project\\documentos";
-	
+
+	public static void main(String[] args) {
+		String[] dom = {"walmart"};
+		String bfs = "bfs";
+		Wrapper w = new Wrapper();
+		w.Start(dom, bfs);
+	}
+
 	public void Start(String [] dominios, String crawlerMethod){
 
 		String actDomain = "";
-		AlphanumComparator ac = new AlphanumComparator();
 
 		try {
 			for (int i = 0; i < dominios.length; i++) {
@@ -39,31 +45,24 @@ public class Wrapper {
 
 				ArrayList<String> fileNames = new ArrayList<String>(Arrays.asList(new File(path).list()));
 
-				//fileNames.sort(ac);	
 				BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), Charsets.UTF_8));
+				File outputFile = new File(productInfoPath + "\\" + dominios[i] +".txt");
+				if (!outputFile.exists()) {
+					outputFile.createNewFile();
+					outputFile.mkdirs();
+				}
+				
+				PrintWriter pw = new PrintWriter(outputFile);
 				
 				for (String name : fileNames) {
 					actDomain = input.readLine();
 					if(actDomain != null){
-				
-						//String s = input.readLine();
 
-						File outputFile = new File(productInfoPath + "\\" + name +".txt");
-						if (!outputFile.exists()) {
-							outputFile.createNewFile();
-							outputFile.mkdirs();
-						}
-						PrintWriter pw = new PrintWriter(outputFile);
-
-						//if(s != null){
-//							System.out.println(fileName);
-							pegarDados(pw, path + name, actDomain);
-							pw.println();
-						//} 
-						pw.close();
+						pegarDados(pw, path + name, actDomain);
 
 					}
 				}
+				pw.close();
 				System.out.println("Wrapper para " + dominios[i] + " terminado.");
 				input.close();
 			}
@@ -75,17 +74,17 @@ public class Wrapper {
 		}
 
 	}
-	
+
 	public void pegarDados(PrintWriter pw, String path, String actDomain) throws IOException {
 		File file = new File(path);
 		Document doc = Jsoup.parse(file, "UTF-8");
-		
+
 		PageInfo info = new PageInfo();
-		
+
 		if (actDomain.contains("www.saraiva.com.br")) {
 			info = getInfoSaraiva(doc);
 		} else if (actDomain.contains("www.walmart.com.br")) {
-			info = getInfoWallmart(doc);
+			info = getInfoWalmart(doc);
 		} else if (actDomain.contains("www.magazineluiza.com.br")) {
 			info = getInfoMagazine(doc);
 		} else if (actDomain.contains("www.americanas.com.br")) {
@@ -107,29 +106,33 @@ public class Wrapper {
 		String titulo = info.getTitulo();
 		if(!(titulo.equalsIgnoreCase("Sem titulo") || titulo.equalsIgnoreCase(""))){
 			String preco = info.getPreco();
-			String outrosDados = info.getDados();
+			String[] outrosDados = info.getDados().split(" > ");
 			synchronized (pw) {
+				String allData ="{Título: "+ titulo+", Preço: " +preco+", ";
+				for (int i = 0; i < outrosDados.length; i++) {
+					allData += outrosDados[i]+", ";
+				}
+				allData += "}";
 				//pw.println("URL: " + site);
-				pw.println("Titulo: " + titulo);
-				pw.println("Preco: " + preco);
-				pw.println(outrosDados);
-				pw.println();
+				//				pw.println("Titulo: " + titulo);
+				//				pw.println("Preco: " + preco);
+				pw.println(allData);
 				pw.flush();
 			}
 		}
 		synchronized (pw) {
-			pw.println();
 			pw.flush();
 		}
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Americanas~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoAmericanas(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = "";
 		String preco = "";
 		String dados ="";
 		Elements elem = (doc.getElementsByAttributeValue("class", "product-name"));
-		
+
 		//Recupera o Titulo
 		String fullTitle = "";
 		if (elem != null && !elem.toString().equals("") && !elem.text().contains("Console")){
@@ -139,17 +142,17 @@ public class Wrapper {
 			}
 			String[] aux = fullTitle.split("-");
 			if(aux[0].equals(" ")){
-				
+
 				titulo = aux[1];
 			}else{
 				titulo = aux[0];
 			}
-			
-			
+
+
 		} else{
 			titulo = "Sem titulo";
 		}
-		
+
 		//Recupera o Preco
 		elem = doc.getElementsByAttributeValue("class", "sales-price");
 
@@ -158,22 +161,22 @@ public class Wrapper {
 		}else{
 			preco = "Sem preço";
 		}
-		
+
 		//Recupera os Dados
 		elem = doc.getElementsByAttributeValue("class", "table table-striped");
 		ArrayList<String[]> desc = new ArrayList<String[]>();
 		StringBuffer sBuffer = new StringBuffer("");
-		
+
 		if (elem != null) {
 			for (Element e : elem) {
 				String texto[] = e.toString().toLowerCase().split("</tr>");
-				
+
 				// Formatação da saída dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
 					desc.add(texto[i].split("</td>"));
 					String[] aux = desc.get(i)[0].split(">");
 					String[] aux2 = desc.get(i)[1].split(">");
-					
+
 					desc.get(i)[0] = aux[aux.length-1];
 					desc.get(i)[1] = aux2[aux2.length-1];
 
@@ -181,9 +184,9 @@ public class Wrapper {
 							|| (desc.get(i)[0].equals("desenvolvedor")) || (desc.get(i)[0].equals("áudio"))
 							|| (desc.get(i)[0].equals("idiomas") || (desc.get(i)[0].equals("plataforma")))) {
 
-						sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " \r\n");
+						sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
 					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etária")) {
-						sBuffer.append("Faixa Etária: " + desc.get(i)[1] + "\r\n");
+						sBuffer.append("Faixa Etária: " + desc.get(i)[1] + " > ");
 					}
 				}
 			}
@@ -192,14 +195,15 @@ public class Wrapper {
 		} else {
 			dados = "";
 		}
-		
+
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
-		
+
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Steam~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoSteam(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = "";
@@ -207,7 +211,7 @@ public class Wrapper {
 		String dados ="";
 		Elements elem = doc.getElementsByAttributeValue("class", "details_block");
 		String[] aux2 = new String[4];
-		
+
 		//Recupera Titulo
 		if (elem != null && !elem.text().equals("")){
 			String[] aux = elem.text().split("Release");
@@ -215,21 +219,21 @@ public class Wrapper {
 			aux[0] = aux[0].replace("Genre:", "");
 			aux[0] = aux[0].replace("Developer:", "");
 			aux[0] = aux[0].replace("Publisher:", "");
-	
+
 			aux2 = aux[0].split("  ");
-			
+
 			titulo = aux2[0];
-			
+
 		}else{
 			titulo = "Sem titulo";
 		}
-		
+
 		//Recupera Preco
 		elem = doc.getElementsByAttributeValue("class", "game_purchase_price price");
 		if(elem == null || elem.text().equals("")){
 			elem = doc.getElementsByAttributeValue("class", "discount_final_price");
 		}
-		
+
 		if (elem != null){
 			if(elem.text().length() >=10) {
 				String []aux = elem.text().split(" R");
@@ -238,34 +242,35 @@ public class Wrapper {
 				preco = elem.text();
 			}
 		}
-		
+
 		//Recupera Dados
-		
+
 		StringBuffer sb = new StringBuffer("");
 		elem = doc.getElementsByAttributeValue("class", "details_block");
-		
+
 		if (elem != null) {
-			sb.append("Gênero: "+aux2[1]+" \r\n");
-			sb.append("Desenvolvedor: "+aux2[2]+" \r\n");
-			sb.append("Distribuidora: "+aux2[3]+" \r\n");
+			sb.append("Gênero: "+aux2[1]+" > ");
+			sb.append("Desenvolvedor: "+aux2[2]+" > ");
+			sb.append("Distribuidora: "+aux2[3]+" > ");
 
 			dados = sb.toString();
 		} else{
 			dados = "Sem Dados";
 		}
-		
+
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Saraiva~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoSaraiva(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = doc.title();
 		String preco = "";
 		String dados ="";
-		
+
 		//Recupera Titulo
 		if (titulo.equals("") || titulo.contains("Console")) {
 			titulo = "Sem Titulo";
@@ -273,7 +278,7 @@ public class Wrapper {
 			String[] aux = titulo.split("-");
 			titulo = aux[0];
 		}
-		
+
 		if(titulo.contains("Sem T")){
 			pi.setPreco("Sem Preco");
 			pi.setTitulo(titulo);
@@ -288,13 +293,13 @@ public class Wrapper {
 
 				preco = "Sem preço";
 			}
-			
+
 			//Recupera Dados
 			elem = doc.getElementsByAttributeValue("itemprop", "title");
 			String genero = elem.text();
 			StringBuffer sb = new StringBuffer("");
 			if(genero.length() > 0){
-				sb.append("Gênero: " + genero.substring(genero.indexOf("Jogos")) + "\r\n");
+				sb.append("Gênero: " + genero.substring(genero.indexOf("Jogos")) + " > ");
 			}
 			ArrayList<Object> desc = new ArrayList<Object>();
 			ArrayList<Object> carc = new ArrayList<Object>();
@@ -322,7 +327,7 @@ public class Wrapper {
 					if (fim.get(i).desc.toString().equalsIgnoreCase("Marca")
 							|| fim.get(i).desc.toString().equalsIgnoreCase("Classificação Indicativa")
 							|| fim.get(i).desc.toString().equalsIgnoreCase("Idioma do Áudio")) {
-						sb.append((fim.get(i).desc.toString() + ": " + fim.get(i).carac.toString()) + "\r\n");
+						sb.append((fim.get(i).desc.toString() + ": " + fim.get(i).carac.toString()) + " > ");
 					}
 					i++;
 				}
@@ -335,23 +340,24 @@ public class Wrapper {
 			pi.setTitulo(titulo);
 			pi.setDados(dados);
 		}
-		
-		
+
+
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Cultura~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoCultura(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = doc.title();
 		String preco = "";
 		String dados ="";
 		Elements elem = doc.getElementsByAttributeValue("class", "ribbons");
-		
+
 		//Recupera Titulo
 		if (elem != null && elem.text().contains("onsole")) {
 			titulo = "Sem titulo";
 		} 
-		
+
 		//Recupera Preco
 		elem = doc.getElementsByAttributeValue("class", "price");
 		if (elem != null) {
@@ -367,7 +373,7 @@ public class Wrapper {
 		} else{
 			preco = "Sem preço";
 		}
-			
+
 		//Recupera Dados
 		elem = doc.getElementsByAttributeValue("id", "product-list-detail");
 		ArrayList<String[]> desc = new ArrayList<String[]>();
@@ -385,21 +391,21 @@ public class Wrapper {
 						desc.get(i)[0] = desc.get(i)[0].substring(desc.get(i)[0].indexOf("<b>"),
 								desc.get(i)[0].indexOf(":"));
 						desc.get(i)[0] = desc.get(i)[0].substring(3, desc.get(i)[0].length());
-						
+
 						if ((desc.get(i)[0].equals("gênero")) || (desc.get(i)[0].contains("classificação indicativa"))
 								|| (desc.get(i)[0].equals("áudio")) || (desc.get(i)[0].equals("idiomas"))|| (desc.get(i)[0].equals("plataforma"))) {
 
-							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + "\r\n");
+							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
 						}else if((desc.get(i)[0].equals("desenvolvedor"))){
 							String[] aux = desc.get(i)[1].split(">");
 							desc.get(i)[1] = aux[1].split("<")[0];
-							
-							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + "\r\n");
+
+							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
 						}else if((desc.get(i)[0].equals("categoria"))){
 							String[] aux= desc.get(i)[1].split("</a>");
 							desc.get(i)[1] = aux[aux.length-1].split(">")[1];
-							
-							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + "\r\n");
+
+							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
 						}
 					}
 				}
@@ -409,21 +415,22 @@ public class Wrapper {
 		} else{
 			dados = "";
 		}
-		
+
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
-		
+
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FastGames~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoFastGames(Document doc){
 		PageInfo pi = new PageInfo();
-		
+
 		String titulo = "";
 		String preco = "";
 		String dados = "";
-		
+
 		Elements elem = doc.getElementsByAttributeValue("itemprop", "name");
 		if (elem != null) {
 			if(elem.text().contains("-")){
@@ -431,7 +438,7 @@ public class Wrapper {
 				System.out.println("aqui");
 			} else {
 				titulo = elem.text();
-				
+
 			}
 		} else {
 			titulo = "Sem título";
@@ -449,18 +456,18 @@ public class Wrapper {
 		}
 
 		//Recupera Dados
-		
+
 		elem = doc.getElementsByAttributeValue("cellpadding", "0");
 		//System.out.println(elem.toString());
 		StringBuffer sb = new StringBuffer("");
 		ArrayList<String[]> desc = new ArrayList<String[]>();
-		
+
 		if (elem != null && elem.text().contains("Gênero")) {
-			
+
 			String[] aux = elem.toString().split("</table>");
 			for (int i = 0; i < aux.length; i++) {
 				desc.add(aux[i].split("</strong>"));
-				
+
 				if(!desc.get(i)[0].endsWith("font>")){
 					String[] aux2 = desc.get(i)[0].split(">");
 					desc.get(i)[0] = aux2[aux2.length-1];
@@ -469,7 +476,7 @@ public class Wrapper {
 					String[] aux3 = desc.get(i)[0].split(">");
 					desc.get(i)[0] = aux3[aux3.length-1];
 				}
-				
+
 				if(!desc.get(i)[1].endsWith("font>")){
 					String[] aux2 = desc.get(i)[1].split(">");
 					desc.get(i)[1] = aux2[aux2.length-1];
@@ -478,7 +485,7 @@ public class Wrapper {
 					String[] aux3 = desc.get(i)[1].split(">");
 					desc.get(i)[1] = aux3[aux3.length-1];
 				}
-				
+
 				if(desc.get(i)[0].equalsIgnoreCase("gênero") || desc.get(i)[0].equalsIgnoreCase("quantidade de jogadores") 
 						|| desc.get(i)[0].equalsIgnoreCase("idade recomendada")|| desc.get(i)[0].equalsIgnoreCase("marca")){
 					sb.append(desc.get(i)[0]+": "+desc.get(i)[1]+"\r\n");
@@ -490,31 +497,32 @@ public class Wrapper {
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
-		
+
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MagazineLuiza~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoMagazine(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = doc.title();
 		String preco = "";
 		String dados ="";
-		
+
 		titulo = titulo.split(" - ")[0];
-		
+
 		if(titulo.contains("Console")){
 			titulo = "Sem Titulo";
 		}
 		//Recupera Preco
 		Elements elem = doc.getElementsByAttributeValue("class", "js-price-value");
-		
+
 		if (elem != null  ){
 			if(!elem.text().contains("XXX")){
 				preco = elem.text();
 			}else{
 				preco = "Sem preço";
 			}
-			
+
 		}else{
 			preco = "Sem preço";
 		}
@@ -530,7 +538,7 @@ public class Wrapper {
 				}
 				if (e.text().contains("Gênero") || e.text().contains("Idioma")
 						|| e.text().contains("Idade recomendada")){
-					sb.append(e.text() + "\r\n");
+					sb.append(e.text() + " > ");
 				}
 				if(e.text().contains("Console") ){
 					isConsole = true;
@@ -541,7 +549,7 @@ public class Wrapper {
 		} else{
 			dados = "Sem Dados";
 		}
-		
+
 		if(!isConsole){
 			pi.setPreco(preco);
 			pi.setTitulo(titulo);
@@ -549,18 +557,19 @@ public class Wrapper {
 		}else{
 			pi.setTitulo("Sem titulo");
 		}
-		
-		
+
+
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GameStop~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoGameStop(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = "";
 		String preco = "";
 		String dados ="";
 		Elements elem = (doc.getElementsByAttributeValue("class", "grid_17 ats-prod-title"));
-	
+
 		//Recupera Titulo
 		if (elem != null && !elem.toString().equals("")){
 			if(elem.text().contains("by")){
@@ -574,41 +583,41 @@ public class Wrapper {
 		}
 		//Recupera Preco
 		elem = (doc.getElementsByAttributeValue("class", "ats-prodBuy-price"));
-		
+
 		if(elem != null && !elem.toString().equals("")){
 			String[] aux = elem.text().split(" ");
 			preco = aux[0];
 		}else{
 			preco = "Sem Preco";
 		}
-		
-		
+
+
 		//Recupera Dados
 		boolean isConsole = false;
 		elem = (doc.getElementsByAttributeValue("class", "gameinfo nograd grid_15 ats-prodRating-gameInfo"));
-		
+
 		ArrayList<String[]> desc = new ArrayList<String[]>();
 		StringBuffer sBuffer = new StringBuffer("");
-		
+
 		if (elem != null) {
 			for (Element e : elem) {
 				String texto[] = e.toString().toLowerCase().split("</li>");
-				
+
 				// Formatação da saída dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
 					desc.add(texto[i].split("<span>"));
 					String[] aux = desc.get(i)[0].split(">");
 					String[] aux2 = desc.get(i)[1].split("<");
-					
+
 					desc.get(i)[0] = aux[aux.length-1];
 					desc.get(i)[1] = aux2[0];
-					
+
 					if (desc.get(i)[0].equals(" developer: ") || desc.get(i)[0].equals(" category: ")
 							|| desc.get(i)[0].equals(" publisher: ") || desc.get(i)[0].equals(" platform: ")) {
 						desc.get(i)[0] = desc.get(i)[0].replace(" ", "");
 						sBuffer.append(desc.get(i)[0] +" "+ desc.get(i)[1] + " \r\n");
 						if(desc.get(i)[1].equalsIgnoreCase("Systems")){
-							
+
 							isConsole = true;
 						}
 					} 
@@ -619,7 +628,7 @@ public class Wrapper {
 		} else {
 			dados = "Sem dados";
 		}
-       
+
 		if(!isConsole){
 			pi.setPreco(preco);
 			pi.setTitulo(titulo);
@@ -629,53 +638,55 @@ public class Wrapper {
 			pi.setPreco("Sem preco");
 			pi.setDados("Sem dados");
 		}
-		
-		
-		
+
+
+
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Pleisteixo~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoPlayStation(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = "";
 		String preco = "";
 		String dados ="";
-		
+
 		//Recupera Titulo
-		
+
 		//Recupera Preco
-		
+
 		//Recupera Dados
-		
+
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
 		return pi;
 	}
-	
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Submarino~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public PageInfo getInfoSubmarino(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = "";
 		String preco = "";
 		String dados ="";
-		
+
 		//Recupera Titulo
-		Elements elem = doc.getElementsByAttributeValue("class", "mp-tit-name prodTitle");
-		if (elem != null && elem.text().contains("Game")) {
-			titulo = elem.text().substring(elem.text().indexOf("Game"), elem.text().length());
+		Elements elem = doc.getElementsByAttributeValue("class", "product-name");
+		if (elem != null && !elem.text().contains("Console")) {
+			titulo = elem.text();
 		} else {
 			titulo = "Sem título";
 		}
-		
+
 		//Recupera Preco
-		elem = doc.getElementsByAttributeValue("itemprop", "price/salesPrice");
+		elem = doc.getElementsByAttributeValue("class", "sales-Price");
 		if (elem != null) {
 			preco = elem.text();
 		} else {
 			preco = "Sem preço";
 		}
 		//Recupera Dados
-		elem = doc.getElementsByAttributeValue("class", "ficha-tecnica");
+		elem = doc.getElementsByAttributeValue("class", "table table-striped");
 		ArrayList<String[]> desc = new ArrayList<String[]>();
 		StringBuffer sb = new StringBuffer("");
 
@@ -685,24 +696,21 @@ public class Wrapper {
 
 				// Formatação da saída dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
-					desc.add(texto[i].split("</th>"));
-					desc.get(i)[0] = desc.get(i)[0].replace("<tbody>", "");
-					desc.get(i)[0] = desc.get(i)[0].replace("<tr>", "");
-					desc.get(i)[0] = desc.get(i)[0].replace("<th>", "");
-					desc.get(i)[0] = desc.get(i)[0].replaceAll("\n", "");
-					desc.get(i)[0] = desc.get(i)[0].replaceAll(" ", "");
-					desc.get(i)[1] = desc.get(i)[1].replaceAll(" ", "");
-					desc.get(i)[1] = desc.get(i)[1].replaceAll("\n", "");
-					desc.get(i)[1] = desc.get(i)[1].replace("<td>", "");
-					desc.get(i)[1] = desc.get(i)[1].replace("</td>", "");
+					desc.add(texto[i].split("</td>"));
+
+					String[] aux = desc.get(i)[0].split(">");
+					String[] aux2 = desc.get(i)[1].split(">");
+
+					desc.get(i)[0] = aux[aux.length-1];
+					desc.get(i)[1] = aux2[aux2.length-1];
 
 					if ((desc.get(i)[0].equalsIgnoreCase("Gênero")) || (desc.get(i)[0].equalsIgnoreCase("Classificação indicativa"))
 							|| (desc.get(i)[0].equalsIgnoreCase("Desenvolvedor")) || (desc.get(i)[0].equalsIgnoreCase("Áudio"))
-							|| (desc.get(i)[0].equalsIgnoreCase("idiomas"))) {
+							|| (desc.get(i)[0].equalsIgnoreCase("idiomas"))|| (desc.get(i)[0].equalsIgnoreCase("marca"))|| (desc.get(i)[0].equalsIgnoreCase("plataforma"))) {
 
-						sb.append(desc.get(i)[0] + ": " + desc.get(i)[1] + "\r\n");
-					} else if (desc.get(i)[0].equalsIgnoreCase("FaixaEtária")) {
-						sb.append("Faixa Etária: " + desc.get(i)[1] + "\r\n");
+						sb.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
+					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etária")) {
+						sb.append("Faixa Etária: " + desc.get(i)[1] + " > ");
 					}
 				}
 			}
@@ -711,73 +719,104 @@ public class Wrapper {
 		} else {
 			dados = "";
 		}
-		
-		
+
+
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
 		return pi;
 	}
-	
-	public PageInfo getInfoWallmart(Document doc){
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Walmart~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	public PageInfo getInfoWalmart(Document doc){
 		PageInfo pi = new PageInfo();
 		String titulo = "";
 		String preco = "";
 		String dados ="";
-		
+
 		//Recupera Titulo
 		Elements elem = doc.getElementsByAttributeValue("class", "product-title");
-		
-		titulo= elem.text();
-		//Recupera Preco
-		Elements o = doc.getElementsByAttributeValue("class", "int");
-		Elements p = doc.getElementsByAttributeValue("class", "dec");
 
-		if (o != null) {
-			if(o.text().contains(" ")){
-				String inte = o.text().substring(0, o.text().indexOf(' '));
-				String dec = p.text().substring(0, p.text().indexOf(' '));
-				preco= (inte + dec);
-			} else {
-				preco = (o.text() + p.text());
+		if(elem != null && !elem.text().contains("Console")){
+			titulo = elem.text().split(" - ")[0];	
+		}else{
+			titulo = "Sem Titulo";
+		}
+
+		//Recupera Preco
+
+		elem = doc.getElementsByAttributeValue("class", "product-price-sell");
+		
+		if (elem != null) {
+			if(elem.text().length()>10){
+				preco= elem.text().split(" R")[0];
+			}else{
+				preco = elem.text();
 			}
+			
 		} else {
 			preco = "Sem preço";
 		}
-		
+
 		//Recupera Dados
 		StringBuffer sb = new StringBuffer("");
-		Elements genero = doc.getElementsByAttributeValue("class", "value-field Genero");
-		Elements marca = doc.getElementsByAttributeValue("itemprop", "brand");
-		Elements faixa = doc.getElementsByAttributeValue("class", "value-field Faixa-Etaria");
-		Elements idioma = doc.getElementsByAttributeValue("class", "value-field Idiomas-Audio");
+		ArrayList<String[]> desc = new ArrayList<String[]>();
+		elem = doc.getElementsByAttributeValue("class", "characteristics table-striped");
 
-		if (genero != null && ! genero.toString().equals("")) {
-			sb.append("Gênero: " + genero.text().substring(0, genero.text().length()) + "\r\n");
-		}
 
-		if (marca != null && !marca.toString().equals("")) {
-			sb.append("Marca: " + marca.text().substring(0, marca.text().length()) + "\r\n");
-		}
+		if (elem != null) {
+			for (Element e : elem) {
+				String texto[] = e.toString().toLowerCase().split("</tr>");
 
-		if (faixa != null && !faixa.toString().equals("")) {
-			sb.append("Faixa: " + faixa.text().substring(0, faixa.text().length()) + "\r\n");
-		}
+				// Formatação da saída dos dados
+				for (int i = 0; i < texto.length - 1; i++) {
 
-		if (idioma != null && !idioma.toString().equals("")) {
-			sb.append("Idioma: " + idioma.text().substring(0, idioma.text().length()) + "\r\n");
+					desc.add(texto[i].split("</"));
+					
+					
+					if(desc.get(i)[1].contains("tfoot")){
+						String[] aux = desc.get(i)[1].split(">");
+						String[] aux2 = desc.get(i)[2].split(">");
+						
+						desc.get(i)[0] = aux[aux.length-1];
+						desc.get(i)[1] = aux2[aux2.length-1];
+					}else{
+						String[] aux = desc.get(i)[0].split(">");
+						String[] aux2 = desc.get(i)[1].split(">");
+						
+						desc.get(i)[0] = aux[aux.length-1];
+						desc.get(i)[1] = aux2[aux2.length-1];
+					}
+					
+
+					
+
+					if ((desc.get(i)[0].equalsIgnoreCase("Gênero")) || (desc.get(i)[0].equalsIgnoreCase("Classificação indicativa"))
+							|| (desc.get(i)[0].equalsIgnoreCase("Desenvolvedor")) || (desc.get(i)[0].equalsIgnoreCase("idiomas Áudio"))
+							|| (desc.get(i)[0].equalsIgnoreCase("marca"))|| (desc.get(i)[0].equalsIgnoreCase("plataforma"))) {
+
+						sb.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
+					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etária")) {
+						sb.append("Faixa Etária: " + desc.get(i)[1] + " > ");
+					}
+				}
+			}
+
+			dados = sb.toString();
+		} else {
+			dados = "";
 		}
 
 		dados = sb.toString();
 		pi.setPreco(preco);
 		pi.setTitulo(titulo);
 		pi.setDados(dados);
-		
+
 		return pi;
 	}
-	
-	
-	
+
+
+
 }
 
 class Box {
