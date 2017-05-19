@@ -74,7 +74,7 @@ public abstract class Spider implements Runnable {
 
 		if (domain == "steampowered")
 			url.append("store.steampowered.com");
-		if (domain == "gamestop")
+		else if (domain == "gamestop")
 			url.append("www.gamestop.com");
 		else {
 			url.append("www.");
@@ -97,10 +97,9 @@ public abstract class Spider implements Runnable {
 
 	@Override
 	public void run() {
-		String http = (this.domain == "steampowered" || this.domain == "walmart" || this.domain == "store.playstation") ? "https://"
+		String http = (this.domain == "walmart" || this.domain == "store.playstation") ? "https://"
 				: "http://";
 		String url = http + this.host;
-
 		try {
 			// Request the robots.txt
 			byte[] robotsTxt = requestRobotsTxt(url);
@@ -117,7 +116,7 @@ public abstract class Spider implements Runnable {
 			// Save the links of the visited pages
 			saveVisitedLinks();
 		} catch (Exception e) {
-			String message = new StringBuffer("Crawler for <<").append(this.domain)
+			String message = new StringBuffer("Crawler for <<").append(url)
 					.append(">> could not run successfully").toString();
 			System.out.println(message);
 			SpiderFactory.error = true;
@@ -214,7 +213,7 @@ public abstract class Spider implements Runnable {
 
 		do {
 			if (this.linksToVisit.isEmpty()) {
-				if (this.getClass() == HeuristicSpider.class && !this.trashToVisit.isEmpty())
+				if (this.getClass() == SpiderHeuristica.class && !this.trashToVisit.isEmpty())
 					next = this.trashToVisit.remove(0);
 				else
 					return null;

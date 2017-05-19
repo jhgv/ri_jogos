@@ -38,6 +38,6 @@ public class SpiderFactory {
 	private void startHeuristicCrawlers() throws RuntimeException {
 		DOCUMENTOS_PATH += "heuristica/";
 		for (int i = 0; i < 10; i++)
-			(this.threads[i] = new Thread(new HeuristicSpider(SpiderFactory.domain[i]))).start();
+			(this.threads[i] = new Thread(new SpiderHeuristica(SpiderFactory.domain[i]))).start();
 	}
 }

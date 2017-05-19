@@ -10,12 +10,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class HeuristicSpider extends Spider {
+public class SpiderHeuristica extends Spider {
 
 	private Dictionary goodTerms;
 	private Dictionary badTerms;
 
-	public HeuristicSpider(String domain) {
+	public SpiderHeuristica(String domain) {
 		super(domain);
 		createDictionaries();
 	}
