@@ -10,8 +10,8 @@ public class Test {
 
 		try {
 			SpiderFactory sf = new SpiderFactory();
-			// sf.startCrawlers("bfs");
-			sf.startCrawlers();
+			 sf.startCrawlers("bfs");
+//			sf.startCrawlers();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

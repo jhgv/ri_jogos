@@ -76,6 +76,9 @@ public abstract class Spider implements Runnable {
 			url.append("store.steampowered.com");
 		else if (domain == "gamestop")
 			url.append("www.gamestop.com");
+		else if(domain == "store.playstation"){
+			url.append("store.playstation.com");
+		}
 		else {
 			url.append("www.");
 			url.append(domain);
@@ -128,8 +131,9 @@ public abstract class Spider implements Runnable {
 	}
 
 	private byte[] requestRobotsTxt(String url) throws MalformedURLException, IOException {
-		String path = "\\documentos\\robots\\";
-		File f = new File(path);
+		StringBuffer path = new StringBuffer("documentos/robots/");
+		//String path = "documentos/robots/";
+		File f = new File(path.toString());
 
 		if (!f.exists())
 			f.mkdir();

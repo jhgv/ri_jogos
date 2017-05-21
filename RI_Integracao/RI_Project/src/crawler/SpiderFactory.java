@@ -18,13 +18,18 @@ public class SpiderFactory {
 		this.threads = new Thread[10];
 	}
 
-	public void startCrawlers() throws IOException, InterruptedException {
+	public void startCrawlers(String abordagem) throws IOException, InterruptedException {
 		File f = new File(DOCUMENTOS_PATH);
 
 		if (!f.exists())
 			f.mkdirs();
-
-		startHeuristicCrawlers();
+		
+		if (abordagem == "heuristica"){
+			startHeuristicCrawlers();
+		}else{
+			startBfsCrawlers();
+		}
+		
 
 		for (Thread t : this.threads){
 			t.join();
@@ -32,6 +37,13 @@ public class SpiderFactory {
 		
 		System.out.println("Terminou o crawler");
 
+	}
+	
+	private void startBfsCrawlers() throws RuntimeException {
+		DOCUMENTOS_PATH += "bfs/";
+		for (int i = 0 ; i < SpiderFactory.domain.length; i++){
+			(this.threads[i] = new Thread(new SpiderBfs(SpiderFactory.domain[i]))).start();
+		}
 	}
 
 	
