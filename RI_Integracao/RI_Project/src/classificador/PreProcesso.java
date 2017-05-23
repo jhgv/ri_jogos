@@ -15,23 +15,23 @@ public class PreProcesso {
 	public static void main(String[] args) throws IOException {
         URL url = null;
         
-        ArrayList<String> listG = getPageText("src\\classificador\\urlsBase\\gLinksToVisit.txt");
-        ArrayList<String> listB = getPageText("src\\classificador\\urlsBase\\bLinksToVisit.txt");
+        ArrayList<String> listG = getPageText("src/classificador/urlsBase/gLinksToVisit.txt");
+        ArrayList<String> listB = getPageText("src/classificador/urlsBase/bLinksToVisit.txt");
         		
        for (int i = 0; i < listG.size(); i++) {
         	try {
             	url = new URL(listG.get(i));
-                getPage(url, "src\\classificador\\Examples\\Positives\\PosDoc"+i);
+                getPage(url, "src/classificador/Examples/Positives/PosDoc"+i);
                 System.out.println(i + ":  " + listG.get(i));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 		}
-        System.out.println("\n\nPáginas Positivas Criadas!!\n\n");
+        System.out.println("\n\nPï¿½ginas Positivas Criadas!!\n\n");
         for (int i = 0; i < listB.size(); i++) {
         	try {
         		url = new URL(listB.get(i));
-                getPage(url, "src\\classificador\\Examples\\Negatives\\NegDoc"+i);
+                getPage(url, "src/classificador/Examples/Negatives/NegDoc"+i);
                 System.out.println(i + ":  " + listB.get(i));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -39,7 +39,7 @@ public class PreProcesso {
 		}
         System.out.println("Capturados e armazenados os exemplos positivos e negativos para a base...");
     }
-	// Função pra varrer os arquivos com as urls Bases e retornar um ArrayList com cada Url
+	// Funï¿½ï¿½o pra varrer os arquivos com as urls Bases e retornar um ArrayList com cada Url
 	public static ArrayList<String> getPageText(String path) throws IOException{
 		ArrayList<String> array = new ArrayList();
 		FileReader file = new FileReader(path); 
@@ -52,7 +52,7 @@ public class PreProcesso {
 		return array;
 	}
 	
-	// Recebe a url que deseja capturar, retorna a página Html, faz o parser pra string e armazena em um novo arquivo
+	// Recebe a url que deseja capturar, retorna a pï¿½gina Html, faz o parser pra string e armazena em um novo arquivo
 	public static void getPage(URL url,String path) throws IOException {
         
 		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(),Charsets.UTF_8));
@@ -81,11 +81,11 @@ public class PreProcesso {
         writer.flush();
         writer.close();
     }
-	// Método criado para uso temporario do wrapper
+	// Mï¿½todo criado para uso temporario do wrapper
 	public static void getHtml(URL url) throws IOException{
 		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(),Charsets.UTF_8));
 
-        PrintWriter writer = new PrintWriter("C:\\Users\\marilda\\Desktop\\Page.html", "UTF-8");
+        PrintWriter writer = new PrintWriter("C:/Users/marilda/Desktop/Page.html", "UTF-8");
 		
         String content = "";
         try {

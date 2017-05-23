@@ -37,7 +37,7 @@ public class Classificador{
 	private Instances instances;
 	private String[] attributes;
 	private static String domain[] = { "americanas", "fastgames", "magazineluiza",
-			"saraiva", "livrariacultura", "gamestop", "submarino", "walmart" , "store.playstation", "store.steampowered"};
+			"saraiva", "livrariacultura", "gamestop", "submarino", "walmart" , "store.playstation", "steampowered"};
 
 	public Classificador(Classifier classifier, Instances instances, String[] attributes){
 		this.classifier = classifier;
@@ -114,15 +114,15 @@ public class Classificador{
 		// Gerando array de string para os atributos do .arff 
 
 		Classificador classify = null;
-		BufferedReader in = new BufferedReader(new FileReader("src\\classificador\\Arffs\\PosNegFS_att.arff"));
+		BufferedReader in = new BufferedReader(new FileReader("src/classificador/Arffs/PosNegFS_att.arff"));
 		ArffReader arff = new ArffReader(in);
 		String at[] = new String[arff.getData().numAttributes()-1];
 		for (int i = 0; i < at.length; i++) at[i]=arff.getData().attribute(i).name();
 
-		// Finalizando a classificação
+		// Finalizando a classificaï¿½ï¿½o
 		//local do modelo de classificacao criado
 
-		String localModelo = "src\\classificador\\Modelos\\J48.model" ;
+		String localModelo = "src/classificador/Modelos/J48.model" ;
 
 		//features do classificador
 		String[] attributes = at;
@@ -151,16 +151,17 @@ public class Classificador{
 	public static void classificador() throws Exception {
 		Classificador classificador = getClassificador();
 
-		int countDomain = 0;
+		int countDomain = -1;
 
-		while(countDomain++ < domain.length){
+		while(countDomain++ < domain.length - 1){
 			
-			File file = new File("documentos\\heuristica\\" + domain[countDomain] );
+			File file = new File("documentos/heuristica/" + domain[countDomain] );
+			System.out.println(file.toURL().toString());
 			ArrayList<File> files = new ArrayList<File>(Arrays.asList((file).listFiles()));
-			File fileLinks = new File("documentos\\heuristica\\" + domain[countDomain]+ "\\links_visitados.txt" );
+			File fileLinks = new File("documentos/heuristica/" + domain[countDomain]+ "/links_visitados.txt" );
 			ArrayList<Integer> links_Ids = new ArrayList<>();
 
-			new File(file.getPath()+ "\\positives\\").mkdir();
+			new File(file.getPath()+ "/positives/").mkdir();
 
 			int count = 0;
 			
@@ -171,7 +172,7 @@ public class Classificador{
 					String page = PreProcesso.getStringPage(file2);
 					
 					if (classificador.classify(page)) {
-						File fileResult = new File(file.getPath() + "\\Positives\\" + file2.getName());
+						File fileResult = new File(file.getPath() + "/Positives/" + file2.getName());
 						setFile(setTextToHtml(file2), fileResult);
 						links_Ids.add(count);
 					}
@@ -180,7 +181,7 @@ public class Classificador{
 				
 			}
 			
-			getPos_Links(file.getPath() + "\\Positives\\posLinks.txt", fileLinks, links_Ids);
+			getPos_Links(file.getPath() + "/Positives/posLinks.txt", fileLinks, links_Ids);
 		}
 	}
 	

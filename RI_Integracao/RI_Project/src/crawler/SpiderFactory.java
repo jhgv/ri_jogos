@@ -24,10 +24,8 @@ public class SpiderFactory {
 		if (!f.exists())
 			f.mkdirs();
 		
-		if (abordagem == "heuristica"){
-			startHeuristicCrawlers();
-		}else{
-			startBfsCrawlers();
+		for (int i = 0 ; i < SpiderFactory.domain.length; i++){
+			(this.threads[i] = new Thread(new Spider(abordagem, SpiderFactory.domain[i]))).start();
 		}
 		
 
@@ -39,17 +37,4 @@ public class SpiderFactory {
 
 	}
 	
-	private void startBfsCrawlers() throws RuntimeException {
-		DOCUMENTOS_PATH += "bfs/";
-		for (int i = 0 ; i < SpiderFactory.domain.length; i++){
-			(this.threads[i] = new Thread(new SpiderBfs(SpiderFactory.domain[i]))).start();
-		}
-	}
-
-	
-	private void startHeuristicCrawlers() throws RuntimeException {
-		DOCUMENTOS_PATH += "heuristica/";
-		for (int i = 0; i < 10; i++)
-			(this.threads[i] = new Thread(new SpiderHeuristica(SpiderFactory.domain[i]))).start();
-	}
 }

@@ -12,14 +12,14 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class PreProcessBase {
 	
-	// Usado só no PreProcessamento da Base, na criação dos arquivos .arff 
+	// Usado sï¿½ no PreProcessamento da Base, na criaï¿½ï¿½o dos arquivos .arff 
 	public static void main(String[] args) throws Exception {
 		TextDirectoryLoader textD = createArff();
 		System.out.println(textD);
 	    Instances dataFiltered = getVector(textD);
 	  
 	    //criando arquivo .arff com conteudo
-	    PrintWriter writer = new PrintWriter("src\\classificador\\Arffs\\PosNeg.arff", "UTF-8");
+	    PrintWriter writer = new PrintWriter("src/classificador/Arffs/PosNeg.arff", "UTF-8");
 	    writer.println(dataFiltered);
 	    writer.close();
 	    
@@ -29,7 +29,7 @@ public class PreProcessBase {
 	public static TextDirectoryLoader createArff() throws IOException{
 		
 		TextDirectoryLoader textD = new TextDirectoryLoader();
-		File file = new File("src\\classificador\\Examples");
+		File file = new File("src/classificador/Examples");
 		textD.setDirectory(file);
 		return textD;
 	}

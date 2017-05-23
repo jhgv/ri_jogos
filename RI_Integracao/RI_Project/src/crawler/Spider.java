@@ -24,13 +24,16 @@ import java.net.MalformedURLException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.Connection.Response;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import crawler.crawlercommons.BaseRobotRules;
 import crawler.crawlercommons.BaseRobotsParser;
 import crawler.crawlercommons.SimpleRobotRules;
 import crawler.crawlercommons.SimpleRobotRulesParser;
 
-public abstract class Spider implements Runnable {
+public class Spider implements Runnable {
 
 	// Constants
 	private static final String USER_AGENT = "Mozilla/5.0 AppleWebKit/537.36 Chrome/52.0.2743.82 Safari/537.36 OPR/39.0.2256.48";
@@ -45,6 +48,10 @@ public abstract class Spider implements Runnable {
 	protected List<String> trashToVisit;
 	protected Set<String> visitedLinks;
 	protected Map<String, String> cookies;
+	protected String type;
+
+	private Dictionary goodTerms;
+	private Dictionary badTerms;
 
 	protected BaseRobotsParser srrp;
 	protected BaseRobotRules srr;
@@ -54,13 +61,14 @@ public abstract class Spider implements Runnable {
 	private int fileIndex;
 
 	// Constructor
-	public Spider(String domain) {
+	public Spider(String type, String domain) {
 		this.domain = domain;
 		this.host = discoverHost(domain);
 		this.linksToVisit = new LinkedList<String>();
 		this.trashToVisit = new LinkedList<String>();
 		this.visitedLinks = new LinkedHashSet<String>();
 		this.cookies = new HashMap<String, String>();
+		this.type = type;
 
 		this.srrp = new SimpleRobotRulesParser();
 		this.srr = new SimpleRobotRules();
@@ -76,10 +84,9 @@ public abstract class Spider implements Runnable {
 			url.append("store.steampowered.com");
 		else if (domain == "gamestop")
 			url.append("www.gamestop.com");
-		else if(domain == "store.playstation"){
+		else if (domain == "store.playstation") {
 			url.append("store.playstation.com");
-		}
-		else {
+		} else {
 			url.append("www.");
 			url.append(domain);
 			url.append(".com.br");
@@ -89,7 +96,7 @@ public abstract class Spider implements Runnable {
 	}
 
 	private StringBuffer discoverFilePath(String domain) {
-		StringBuffer path = new StringBuffer(SpiderFactory.DOCUMENTOS_PATH).append(domain);
+		StringBuffer path = new StringBuffer(SpiderFactory.DOCUMENTOS_PATH + this.type + "/").append(domain);
 		File f = new File(path.toString());
 
 		if (!f.exists())
@@ -100,8 +107,7 @@ public abstract class Spider implements Runnable {
 
 	@Override
 	public void run() {
-		String http = (this.domain == "walmart" || this.domain == "store.playstation") ? "https://"
-				: "http://";
+		String http = (this.domain == "walmart" || this.domain == "store.playstation") ? "https://" : "http://";
 		String url = http + this.host;
 		try {
 			// Request the robots.txt
@@ -119,8 +125,8 @@ public abstract class Spider implements Runnable {
 			// Save the links of the visited pages
 			saveVisitedLinks();
 		} catch (Exception e) {
-			String message = new StringBuffer("Crawler for <<").append(url)
-					.append(">> could not run successfully").toString();
+			String message = new StringBuffer("Crawler for <<").append(url).append(">> could not run successfully")
+					.toString();
 			System.out.println(message);
 			SpiderFactory.error = true;
 
@@ -132,7 +138,7 @@ public abstract class Spider implements Runnable {
 
 	private byte[] requestRobotsTxt(String url) throws MalformedURLException, IOException {
 		StringBuffer path = new StringBuffer("documentos/robots/");
-		//String path = "documentos/robots/";
+		// String path = "documentos/robots/";
 		File f = new File(path.toString());
 
 		if (!f.exists())
@@ -170,9 +176,9 @@ public abstract class Spider implements Runnable {
 		int timeOut = 8000, maxTimeOut = 50000;
 		int timeSleep = incTimeSleep << 1, maxTimeSleep = 600000;
 		int count = 0;
-		
+
 		System.out.println("Starting crawler......");
-		
+
 		while (this.visitedLinks.size() < MAXIMUM_QUANTITY_PAGES && nextUrl != null) {
 			if (pause) {
 				Thread.sleep(timeSleep);
@@ -207,17 +213,13 @@ public abstract class Spider implements Runnable {
 		}
 	}
 
-	/***
-	 * This method will get the next URL to be visited.
-	 * 
-	 * @return (String) the next URL to be visited
-	 */
+	
 	private String nextUrl() {
 		String next;
 
 		do {
 			if (this.linksToVisit.isEmpty()) {
-				if (this.getClass() == SpiderHeuristica.class && !this.trashToVisit.isEmpty())
+				if (this.getClass() == Spider.class && !this.trashToVisit.isEmpty())
 					next = this.trashToVisit.remove(0);
 				else
 					return null;
@@ -229,10 +231,87 @@ public abstract class Spider implements Runnable {
 		return next;
 	}
 
+	public void crawl(String url, int timeout) throws IOException, InterruptedException {
+		if(this.type == "heuristica"){
+			createDictionaries();
+			crawlHeuristic(url, timeout);
+		}else{
+			crawlBfs(url, timeout);
+		}
+		
+	}
 	
-	abstract void crawl(String url, int timeout) throws IOException, InterruptedException;
+	
 
+	public void crawlHeuristic(String url, int timeout) throws IOException, InterruptedException {
+		SpiderFactory.DOCUMENTOS_PATH += "/heuristica";
+		Connection.Response html = connect(url, timeout);
+		Thread.sleep(1000);
+
+		// Get the page body
+		saveHtml(html.body());
+		this.cookies.putAll(html.cookies());
+
+		// Get the next links
+		Document doc = html.parse();
+		Elements links = doc.select("a[href]");
+		String tempLink;
+		String toCompare = "://" + this.host;
+
+		for (Element link : links) {
+			tempLink = link.absUrl("href").toLowerCase();
+
+			if (tempLink.length() > 140)
+				continue;
+			else if (tempLink.contains("#"))
+				tempLink = tempLink.substring(0, tempLink.indexOf("#"));
+
+			if (tempLink.contains(toCompare) && this.srr.isAllowed(tempLink))
+				selectHeuristic(tempLink);
+		}
+	}
 	
+	private void createDictionaries() {
+		goodTerms = new Dictionary();
+		badTerms = new Dictionary();
+
+		String[] words = "3ds_game_games_jogo_jogos_pc_ps1_ps2_ps3_ps4_psp_ps-1_ps-2_ps-3_ps-4_ps-vita_xbox_wii"
+				.split("_");
+		for (String w : words) {
+			goodTerms.addWord(w);
+		}
+
+		words = "acessorio_acessorios_amiibo_capa_card_carregador_cartao_case_console_consoles_controle_guitarra_headset_mouse_teclado"
+				.split("_");
+		for (String w : words){
+			badTerms.addWord(w);
+		}
+			
+
+	}
+	
+	public void crawlBfs(String url, int timeout) throws IOException, InterruptedException {
+		Connection.Response html = connect(url, timeout);
+		Thread.sleep(1000);
+
+		// Get the page body
+		saveHtml(html.body());
+		this.cookies.putAll(html.cookies());
+
+		// Get the next links
+		Document doc = html.parse();
+		Elements links = doc.select("a[href]");
+		String tempLink;
+		String toCompare = "://" + this.host;
+
+		for (Element link : links) {
+			tempLink = link.absUrl("href").toLowerCase();
+
+			if (tempLink.contains(toCompare) && this.srr.isAllowed(tempLink))
+				this.linksToVisit.add(tempLink);
+		}
+	}
+
 	protected Response connect(String url, int timeout) throws IOException {
 		Connection c = Jsoup.connect(url);
 		c.userAgent(USER_AGENT);
@@ -247,8 +326,7 @@ public abstract class Spider implements Runnable {
 
 	protected void saveHtml(String doc) throws IOException {
 		StringBuffer path = new StringBuffer(this.filePath.toString());
-		path.append("/doc"+(this.fileIndex++) + ".html"); //Para ficar docXX.html
-
+		path.append("/doc" + (this.fileIndex++) + ".html"); // Para ficar docXX.html
 		FileWriter fwDoc = new FileWriter(path.toString());
 		fwDoc.write(doc);
 		fwDoc.close();
@@ -267,5 +345,84 @@ public abstract class Spider implements Runnable {
 		}
 
 		fwLinks.close();
+	}
+
+	private void selectHeuristic(String url) {
+		if (this.domain == "steampowered") {
+			steamHeuristic(url);
+		} else {
+			String[] words = { "" };
+			boolean gD = (this.domain == "americanas" || this.domain == "fnac" || this.domain == "livrariacultura"
+					|| this.domain == "magazineluiza" || this.domain == "nagem" || this.domain == "submarino");
+
+			if (url.contains("br/"))
+				words = url.substring(url.indexOf("br/")).split("[/-]");
+
+			standardHeuristic(url, words, gD);
+		}
+	}
+
+	private void steamHeuristic(String url) {
+		if (url.contains("?l="))
+			return;
+
+		if (url.contains(".com/app") && !url.contains("agecheck"))
+			this.linksToVisit.add(0, url);
+		else
+			this.linksToVisit.add(url);
+	}
+
+	private void standardHeuristic(String url, String[] words, boolean gD) {
+		boolean bT = badTerms.contains(words), gT = goodTerms.contains(words);
+
+		if (bT && gT)
+			this.linksToVisit.add(url);
+		else if (!bT && gT && !gD)
+			this.linksToVisit.add(0, url);
+		else if (!bT && gT && gD) {
+			if (url.contains("/produto/") || url.contains("/p/") || url.endsWith("/p") || url.contains("/eletronicos/"))
+				this.linksToVisit.add(0, url);
+			else
+				this.linksToVisit.add(url);
+		} else
+			this.trashToVisit.add(url);
+	}
+}
+
+class Dictionary {
+	List<String> words;
+
+	public Dictionary() {
+		this.words = new LinkedList<String>();
+	}
+
+	/***
+	 * This method will add a String s to the dictionary.
+	 * 
+	 * @param s
+	 *            the String to be added to the dictionary
+	 */
+	public void addWord(String s) {
+		words.add(s);
+	}
+
+	/***
+	 * This method will check if the dictionary contains any of the words
+	 * received.
+	 * 
+	 * @param toBeChecked
+	 *            list with the words to be checked
+	 * @return TRUE if the dictionary contains any words received; FALSE
+	 *         otherwise
+	 */
+	public boolean contains(String[] toBeChecked) {
+		for (String word : words) {
+			for (String check : toBeChecked) {
+				if (word.equals(check))
+					return true;
+			}
+		}
+
+		return false;
 	}
 }

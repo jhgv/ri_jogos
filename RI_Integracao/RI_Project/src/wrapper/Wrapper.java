@@ -19,7 +19,7 @@ import org.jsoup.select.Elements;
 
 
 public class Wrapper {
-	public static String ARTIFACT_PATH = "..\\RI_Project\\documentos";
+	public static String ARTIFACT_PATH = "documentos";
 
 
 	public void Start(String [] dominios, String crawlerMethod){
@@ -28,10 +28,10 @@ public class Wrapper {
 
 		try {
 			for (int i = 0; i < dominios.length; i++) {
-				String path = ARTIFACT_PATH + "\\" +  crawlerMethod + "\\"+ dominios[i] + "\\positives\\";
+				String path = ARTIFACT_PATH + "/" +  crawlerMethod + "/"+ dominios[i] + "/positives/";
 				File inputFile = new File(path + "posLinks.txt");
 
-				String productInfoPath = ARTIFACT_PATH + "\\" + "output_wrapper\\" + dominios[i] + "\\";
+				String productInfoPath = ARTIFACT_PATH + "/" + "output_wrapper/" + dominios[i] + "/";
 
 				if(!new File(productInfoPath).exists()){
 					new File(productInfoPath).mkdirs();
@@ -40,7 +40,7 @@ public class Wrapper {
 				ArrayList<String> fileNames = new ArrayList<String>(Arrays.asList(new File(path).list()));
 
 				BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), Charsets.UTF_8));
-				File outputFile = new File(productInfoPath + "\\" + dominios[i] +".txt");
+				File outputFile = new File(productInfoPath + "/" + dominios[i] +".txt");
 				if (!outputFile.exists()) {
 					outputFile.createNewFile();
 					outputFile.mkdirs();
@@ -102,7 +102,7 @@ public class Wrapper {
 			String preco = info.getPreco();
 			String[] outrosDados = info.getDados().split(" > ");
 			synchronized (pw) {
-				String allData ="{Título: "+ titulo+", Preço: " +preco+", ";
+				String allData ="{Tï¿½tulo: "+ titulo+", Preï¿½o: " +preco+", ";
 				for (int i = 0; i < outrosDados.length; i++) {
 					allData += outrosDados[i]+", ";
 				}
@@ -153,7 +153,7 @@ public class Wrapper {
 		if (elem != null){
 			preco = elem.text();
 		}else{
-			preco = "Sem preço";
+			preco = "Sem preï¿½o";
 		}
 
 		//Recupera os Dados
@@ -165,7 +165,7 @@ public class Wrapper {
 			for (Element e : elem) {
 				String texto[] = e.toString().toLowerCase().split("</tr>");
 
-				// Formatação da saída dos dados
+				// Formataï¿½ï¿½o da saï¿½da dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
 					desc.add(texto[i].split("</td>"));
 					String[] aux = desc.get(i)[0].split(">");
@@ -174,13 +174,13 @@ public class Wrapper {
 					desc.get(i)[0] = aux[aux.length-1];
 					desc.get(i)[1] = aux2[aux2.length-1];
 
-					if ((desc.get(i)[0].equals("gênero")) || (desc.get(i)[0].equals("classificação indicativa"))
-							|| (desc.get(i)[0].equals("desenvolvedor")) || (desc.get(i)[0].equals("áudio"))
+					if ((desc.get(i)[0].equals("gï¿½nero")) || (desc.get(i)[0].equals("classificaï¿½ï¿½o indicativa"))
+							|| (desc.get(i)[0].equals("desenvolvedor")) || (desc.get(i)[0].equals("ï¿½udio"))
 							|| (desc.get(i)[0].equals("idiomas") || (desc.get(i)[0].equals("plataforma")))) {
 
 						sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
-					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etária")) {
-						sBuffer.append("Faixa Etária: " + desc.get(i)[1] + " > ");
+					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etï¿½ria")) {
+						sBuffer.append("Faixa Etï¿½ria: " + desc.get(i)[1] + " > ");
 					}
 				}
 			}
@@ -243,7 +243,7 @@ public class Wrapper {
 		elem = doc.getElementsByAttributeValue("class", "details_block");
 
 		if (elem != null) {
-			sb.append("Gênero: "+aux2[1]+" > ");
+			sb.append("Gï¿½nero: "+aux2[1]+" > ");
 			sb.append("Desenvolvedor: "+aux2[2]+" > ");
 			sb.append("Distribuidora: "+aux2[3]+" > ");
 
@@ -285,7 +285,7 @@ public class Wrapper {
 						elem.toString().indexOf("</strong>"));
 			} else {
 
-				preco = "Sem preço";
+				preco = "Sem preï¿½o";
 			}
 
 			//Recupera Dados
@@ -293,7 +293,7 @@ public class Wrapper {
 			String genero = elem.text();
 			StringBuffer sb = new StringBuffer("");
 			if(genero.length() > 0){
-				sb.append("Gênero: " + genero.substring(genero.indexOf("Jogos")) + " > ");
+				sb.append("Gï¿½nero: " + genero.substring(genero.indexOf("Jogos")) + " > ");
 			}
 			ArrayList<Object> desc = new ArrayList<Object>();
 			ArrayList<Object> carc = new ArrayList<Object>();
@@ -319,8 +319,8 @@ public class Wrapper {
 				i = 0;
 				while (i < fim.size()) {
 					if (fim.get(i).desc.toString().equalsIgnoreCase("Marca")
-							|| fim.get(i).desc.toString().equalsIgnoreCase("Classificação Indicativa")
-							|| fim.get(i).desc.toString().equalsIgnoreCase("Idioma do Áudio")) {
+							|| fim.get(i).desc.toString().equalsIgnoreCase("Classificaï¿½ï¿½o Indicativa")
+							|| fim.get(i).desc.toString().equalsIgnoreCase("Idioma do ï¿½udio")) {
 						sb.append((fim.get(i).desc.toString() + ": " + fim.get(i).carac.toString()) + " > ");
 					}
 					i++;
@@ -365,7 +365,7 @@ public class Wrapper {
 				preco = elem.text();
 			}
 		} else{
-			preco = "Sem preço";
+			preco = "Sem preï¿½o";
 		}
 
 		//Recupera Dados
@@ -377,7 +377,7 @@ public class Wrapper {
 			for (Element e : elem) {
 				String texto[] = e.toString().toLowerCase().split("</li>");
 
-				// Formatação da saída dos dados
+				// Formataï¿½ï¿½o da saï¿½da dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
 					desc.add(texto[i].split("</b>"));
 
@@ -386,8 +386,8 @@ public class Wrapper {
 								desc.get(i)[0].indexOf(":"));
 						desc.get(i)[0] = desc.get(i)[0].substring(3, desc.get(i)[0].length());
 
-						if ((desc.get(i)[0].equals("gênero")) || (desc.get(i)[0].contains("classificação indicativa"))
-								|| (desc.get(i)[0].equals("áudio")) || (desc.get(i)[0].equals("idiomas"))|| (desc.get(i)[0].equals("plataforma"))) {
+						if ((desc.get(i)[0].equals("gï¿½nero")) || (desc.get(i)[0].contains("classificaï¿½ï¿½o indicativa"))
+								|| (desc.get(i)[0].equals("ï¿½udio")) || (desc.get(i)[0].equals("idiomas"))|| (desc.get(i)[0].equals("plataforma"))) {
 
 							sBuffer.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
 						}else if((desc.get(i)[0].equals("desenvolvedor"))){
@@ -435,7 +435,7 @@ public class Wrapper {
 
 			}
 		} else {
-			titulo = "Sem título";
+			titulo = "Sem tï¿½tulo";
 		}
 		//Recupera Preco
 		elem = doc.getElementsByAttributeValue("class", "preco-avista precoAvista");
@@ -446,7 +446,7 @@ public class Wrapper {
 				preco = elem.text().split(" R")[0];
 			}
 		} else{
-			preco = "Sem preço";
+			preco = "Sem preï¿½o";
 		}
 
 		//Recupera Dados
@@ -456,7 +456,7 @@ public class Wrapper {
 		StringBuffer sb = new StringBuffer("");
 		ArrayList<String[]> desc = new ArrayList<String[]>();
 
-		if (elem != null && elem.text().contains("Gênero")) {
+		if (elem != null && elem.text().contains("Gï¿½nero")) {
 
 			String[] aux = elem.toString().split("</table>");
 			for (int i = 0; i < aux.length; i++) {
@@ -480,7 +480,7 @@ public class Wrapper {
 					desc.get(i)[1] = aux3[aux3.length-1];
 				}
 
-				if(desc.get(i)[0].equalsIgnoreCase("gênero") || desc.get(i)[0].equalsIgnoreCase("quantidade de jogadores") 
+				if(desc.get(i)[0].equalsIgnoreCase("gï¿½nero") || desc.get(i)[0].equalsIgnoreCase("quantidade de jogadores") 
 						|| desc.get(i)[0].equalsIgnoreCase("idade recomendada")|| desc.get(i)[0].equalsIgnoreCase("marca")){
 					sb.append(desc.get(i)[0]+": "+desc.get(i)[1]+"\r\n");
 				}
@@ -514,11 +514,11 @@ public class Wrapper {
 			if(!elem.text().contains("XXX")){
 				preco = elem.text();
 			}else{
-				preco = "Sem preço";
+				preco = "Sem preï¿½o";
 			}
 
 		}else{
-			preco = "Sem preço";
+			preco = "Sem preï¿½o";
 		}
 		//Recupera Dados
 		boolean isConsole = false;
@@ -527,10 +527,10 @@ public class Wrapper {
 
 		if (elem != null) {
 			for (Element e : elem) {
-				if (e.text().contains("Informações")){
-					sb.append(e.text().substring(e.text().indexOf("Marca"), e.text().indexOf("Referência")) + "\r\n");
+				if (e.text().contains("Informaï¿½ï¿½es")){
+					sb.append(e.text().substring(e.text().indexOf("Marca"), e.text().indexOf("Referï¿½ncia")) + "\r\n");
 				}
-				if (e.text().contains("Gênero") || e.text().contains("Idioma")
+				if (e.text().contains("Gï¿½nero") || e.text().contains("Idioma")
 						|| e.text().contains("Idade recomendada")){
 					sb.append(e.text() + " > ");
 				}
@@ -597,7 +597,7 @@ public class Wrapper {
 			for (Element e : elem) {
 				String texto[] = e.toString().toLowerCase().split("</li>");
 
-				// Formatação da saída dos dados
+				// Formataï¿½ï¿½o da saï¿½da dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
 					desc.add(texto[i].split("<span>"));
 					String[] aux = desc.get(i)[0].split(">");
@@ -669,7 +669,7 @@ public class Wrapper {
 		if (elem != null && !elem.text().contains("Console")) {
 			titulo = elem.text();
 		} else {
-			titulo = "Sem título";
+			titulo = "Sem tï¿½tulo";
 		}
 
 		//Recupera Preco
@@ -677,7 +677,7 @@ public class Wrapper {
 		if (elem != null) {
 			preco = elem.text();
 		} else {
-			preco = "Sem preço";
+			preco = "Sem preï¿½o";
 		}
 		//Recupera Dados
 		elem = doc.getElementsByAttributeValue("class", "table table-striped");
@@ -688,7 +688,7 @@ public class Wrapper {
 			for (Element e : elem) {
 				String texto[] = e.toString().toLowerCase().split("</tr>");
 
-				// Formatação da saída dos dados
+				// Formataï¿½ï¿½o da saï¿½da dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
 					desc.add(texto[i].split("</td>"));
 
@@ -698,13 +698,13 @@ public class Wrapper {
 					desc.get(i)[0] = aux[aux.length-1];
 					desc.get(i)[1] = aux2[aux2.length-1];
 
-					if ((desc.get(i)[0].equalsIgnoreCase("Gênero")) || (desc.get(i)[0].equalsIgnoreCase("Classificação indicativa"))
-							|| (desc.get(i)[0].equalsIgnoreCase("Desenvolvedor")) || (desc.get(i)[0].equalsIgnoreCase("Áudio"))
+					if ((desc.get(i)[0].equalsIgnoreCase("Gï¿½nero")) || (desc.get(i)[0].equalsIgnoreCase("Classificaï¿½ï¿½o indicativa"))
+							|| (desc.get(i)[0].equalsIgnoreCase("Desenvolvedor")) || (desc.get(i)[0].equalsIgnoreCase("ï¿½udio"))
 							|| (desc.get(i)[0].equalsIgnoreCase("idiomas"))|| (desc.get(i)[0].equalsIgnoreCase("marca"))|| (desc.get(i)[0].equalsIgnoreCase("plataforma"))) {
 
 						sb.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
-					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etária")) {
-						sb.append("Faixa Etária: " + desc.get(i)[1] + " > ");
+					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etï¿½ria")) {
+						sb.append("Faixa Etï¿½ria: " + desc.get(i)[1] + " > ");
 					}
 				}
 			}
@@ -749,7 +749,7 @@ public class Wrapper {
 			}
 			
 		} else {
-			preco = "Sem preço";
+			preco = "Sem preï¿½o";
 		}
 
 		//Recupera Dados
@@ -762,7 +762,7 @@ public class Wrapper {
 			for (Element e : elem) {
 				String texto[] = e.toString().toLowerCase().split("</tr>");
 
-				// Formatação da saída dos dados
+				// Formataï¿½ï¿½o da saï¿½da dos dados
 				for (int i = 0; i < texto.length - 1; i++) {
 
 					desc.add(texto[i].split("</"));
@@ -785,13 +785,13 @@ public class Wrapper {
 
 					
 
-					if ((desc.get(i)[0].equalsIgnoreCase("Gênero")) || (desc.get(i)[0].equalsIgnoreCase("Classificação indicativa"))
-							|| (desc.get(i)[0].equalsIgnoreCase("Desenvolvedor")) || (desc.get(i)[0].equalsIgnoreCase("idiomas Áudio"))
+					if ((desc.get(i)[0].equalsIgnoreCase("Gï¿½nero")) || (desc.get(i)[0].equalsIgnoreCase("Classificaï¿½ï¿½o indicativa"))
+							|| (desc.get(i)[0].equalsIgnoreCase("Desenvolvedor")) || (desc.get(i)[0].equalsIgnoreCase("idiomas ï¿½udio"))
 							|| (desc.get(i)[0].equalsIgnoreCase("marca"))|| (desc.get(i)[0].equalsIgnoreCase("plataforma"))) {
 
 						sb.append(desc.get(i)[0] + ": " + desc.get(i)[1] + " > ");
-					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etária")) {
-						sb.append("Faixa Etária: " + desc.get(i)[1] + " > ");
+					} else if (desc.get(i)[0].equalsIgnoreCase("Faixa Etï¿½ria")) {
+						sb.append("Faixa Etï¿½ria: " + desc.get(i)[1] + " > ");
 					}
 				}
 			}
